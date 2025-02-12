@@ -121,8 +121,10 @@ fun CalendarView(
                 )
 
             }
-            Spacer(Modifier.weight(1f))
+
             if (isTwoWeeksSupport) {
+                Spacer(Modifier.weight(1f))
+
                 DropdownMenuToggle(!isMonthlyView) {
                     isMonthlyView = !isMonthlyView
                 }
