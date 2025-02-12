@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,10 +19,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,13 +48,14 @@ import kotlinx.datetime.todayIn
 
 @Composable
 fun CalendarView(
+    isTwoWeeksSupport: Boolean = true,
     selectedDate: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
     eventDays: List<LocalDate> = emptyList(),
     onDateSelected: (LocalDate) -> Unit = {},
     onMonthChanged: (LocalDate) -> Unit = {},
     firstDayOfWeek: DayOfWeek = DayOfWeek.SUNDAY,
     headerModifier: Modifier = Modifier,
-    headerTextStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.headlineMedium,
+    headerTextStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
     selectedDayColor: Color = Color.Blue,
     currentDayColor: Color = Color.Green,
     eventDayColor: Color = Color.Red,
@@ -77,8 +82,10 @@ fun CalendarView(
 
     Column(modifier = Modifier.padding(16.dp).pointerInput(Unit) {
         detectVerticalDragGestures { _, dragAmount ->
+            if (isTwoWeeksSupport) {
             isMonthlyView = dragAmount >= 0
             currentHalf = 1
+            }
         }
     }) {
         Row(
@@ -93,11 +100,10 @@ fun CalendarView(
                 } else {
                     if (currentHalf == 2) {
                         currentHalf = 1
-                    } else {
-                        currentHalf = 2
                         selectedMonth = selectedMonth.minus(DatePeriod(months = 1))
                         onMonthChanged(selectedMonth)
-
+                    } else {
+                        currentHalf = 2
                     }
                 }
             }) {
@@ -106,17 +112,24 @@ fun CalendarView(
                     contentDescription = "Previous"
                 )
             }
-            Text(
-                text = "${selectedMonth.month.name} ${selectedMonth.year}",
-                style = headerTextStyle,
-                modifier = Modifier.clickable { onDateSelected(selectedMonth) }
-                    .padding(bottom = 8.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "${selectedMonth.month.name} ${selectedMonth.year}",
+                    style = headerTextStyle,
+                    modifier = Modifier.clickable { onDateSelected(selectedMonth) }
+                        .padding(bottom = 8.dp)
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                if (isTwoWeeksSupport) {
+                    DropdownMenuToggle(!isMonthlyView) {
+                        isMonthlyView = !isMonthlyView
+                    }
+                }
+            }
             IconButton(onClick = {
                 if (isMonthlyView) {
                     selectedMonth = selectedMonth.plus(DatePeriod(months = 1))
                     onMonthChanged(selectedMonth)
-
                 } else {
                     if (currentHalf == 1) {
                         currentHalf = 2
@@ -144,6 +157,35 @@ fun CalendarView(
             currentDayColor = currentDayColor,
             eventDayColor = eventDayColor
         )
+    }
+}
+
+@Composable
+fun DropdownMenuToggle(isTwoWeeksView: Boolean, onSelectionChange: (Boolean) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        TextButton(onClick = { expanded = true }) {
+            Text(if (isTwoWeeksView) "2 Weeks" else "Month")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text("Month") },
+                onClick = {
+                    onSelectionChange(false)
+                    expanded = false
+                }
+            )
+            DropdownMenuItem(
+                text = { Text("2 Weeks") },
+                onClick = {
+                    onSelectionChange(true)
+                    expanded = false
+                }
+            )
+        }
     }
 }
 
