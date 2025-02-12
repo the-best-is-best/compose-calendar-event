@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -41,7 +44,7 @@ import kotlinx.datetime.todayIn
 
 
 @Composable
-fun CalendarView(
+fun <T> CalendarView(
     isTwoWeeksSupport: Boolean = true,
     selectedDate: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
     eventDays: List<LocalDate> = emptyList(),
@@ -53,6 +56,7 @@ fun CalendarView(
     selectedDayColor: Color = Color.Blue,
     currentDayColor: Color = Color.Green,
     eventDayColor: Color = Color.Red,
+    displayItem: @Composable (LocalDate) -> Unit
 ) {
     var selectedMonth by remember {
         mutableStateOf(
@@ -74,7 +78,9 @@ fun CalendarView(
         daysOfMonth.subList(splitIndex, daysOfMonth.size)
     )
 
-    Column(modifier = Modifier.padding(16.dp)
+
+    Column(
+        modifier = Modifier.fillMaxHeight().fillMaxWidth().padding(16.dp)
         .pointerInput(Unit) {
             if (isTwoWeeksSupport) {
                 detectVerticalDragGestures { _, dragAmount ->
@@ -101,6 +107,8 @@ fun CalendarView(
 
         })
     ) {
+
+
         Row(
             modifier = headerModifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -113,10 +121,11 @@ fun CalendarView(
                 } else {
                     if (currentHalf == 2) {
                         currentHalf = 1
-                        selectedMonth = selectedMonth.minus(DatePeriod(months = 1))
-                        onMonthChanged(selectedMonth)
+
                     } else {
                         currentHalf = 2
+                        selectedMonth = selectedMonth.minus(DatePeriod(months = 1))
+                        onMonthChanged(selectedMonth)
                     }
                 }
             }) {
@@ -129,7 +138,10 @@ fun CalendarView(
                 Text(
                     text = "${selectedMonth.month.name} ${selectedMonth.year}",
                     style = headerTextStyle,
-                    modifier = Modifier.clickable { onDateSelected(selectedMonth) }
+                    modifier = Modifier.clickable {
+                        onDateSelected(selectedMonth)
+
+                    }
                         .padding(bottom = 8.dp)
                 )
 
@@ -171,7 +183,16 @@ fun CalendarView(
             selectedDate = selectedDate,
             selectedDayColor = selectedDayColor,
             currentDayColor = currentDayColor,
-            eventDayColor = eventDayColor
+            eventDayColor = eventDayColor,
         )
+        Spacer(Modifier.height(30.dp))
+
+        LazyColumn {
+            item {
+                displayItem(selectedDate)
+
+            }
+        }
+
     }
 }
