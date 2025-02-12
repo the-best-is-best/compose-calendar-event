@@ -14,7 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.compose_calendar_event.CalendarView
+import io.github.compose_calendar_event.monthly.CalendarView
 import io.github.sample.theme.AppTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
@@ -41,6 +41,7 @@ fun CalendarScreen() {
 
 
     CalendarView(
+        isTwoWeeksSupport = true,
         selectedDate = selectedMonth,
         eventDays = listOf(
             LocalDate(2025, 2, 14),

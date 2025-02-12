@@ -1,31 +1,20 @@
-package io.github.compose_calendar_event
+package io.github.compose_calendar_event.monthly
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,8 +28,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.github.compose_calendar_event.utils.getDaysOfMonth
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
@@ -49,6 +38,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.todayIn
+
 
 @Composable
 fun CalendarView(
@@ -148,7 +138,7 @@ fun CalendarView(
             if (isTwoWeeksSupport) {
                 Spacer(Modifier.weight(1f))
 
-                DropdownMenuToggle(!isMonthlyView) {
+                CalendarType(!isMonthlyView) {
                     isMonthlyView = !isMonthlyView
                 }
             }
@@ -183,131 +173,5 @@ fun CalendarView(
             currentDayColor = currentDayColor,
             eventDayColor = eventDayColor
         )
-    }
-}
-
-@Composable
-fun DropdownMenuToggle(isTwoWeeksView: Boolean, onSelectionChange: (Boolean) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    Box {
-        TextButton(onClick = { expanded = true }) {
-            Text(if (isTwoWeeksView) "2 Weeks" else "Month")
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("Month") },
-                onClick = {
-                    onSelectionChange(false)
-                    expanded = false
-                }
-            )
-            DropdownMenuItem(
-                text = { Text("2 Weeks") },
-                onClick = {
-                    onSelectionChange(true)
-                    expanded = false
-                }
-            )
-        }
-    }
-}
-
-fun getDaysOfMonth(date: LocalDate, firstDayOfWeek: DayOfWeek): List<Int> {
-    val firstDayOfMonth = LocalDate(date.year, date.month, 1)
-    val lastDay =
-        firstDayOfMonth.plus(DatePeriod(months = 1)).minus(DatePeriod(days = 1)).dayOfMonth
-
-    val startDayOffset = (firstDayOfMonth.dayOfWeek.ordinal - firstDayOfWeek.ordinal + 7) % 7
-    val days = mutableListOf<Int>().apply {
-        addAll(List(startDayOffset) { 0 })
-        addAll(1..lastDay)
-        while (size % 7 != 0) add(0)
-    }
-    return days
-}
-
-@Composable
-fun MonthCalendar(
-    days: List<Int>,
-    eventDays: List<LocalDate>,
-    onDateSelected: (LocalDate) -> Unit,
-    selectedDate: LocalDate,
-    selectedDayColor: Color,
-    currentDayColor: Color,
-    eventDayColor: Color
-) {
-    LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = Modifier.padding(top = 8.dp)) {
-        items(days) { date ->
-            val safeDate =
-                runCatching { LocalDate(selectedDate.year, selectedDate.month, date) }.getOrNull()
-            val hasEvent = safeDate != null && eventDays.contains(safeDate)
-            DayItem(
-                date = date,
-                isSelected = safeDate == selectedDate,
-                isCurrentDay = safeDate == Clock.System.todayIn(TimeZone.currentSystemDefault()),
-                hasEvent = hasEvent,
-                selectedDayColor = selectedDayColor,
-                currentDayColor = currentDayColor,
-                eventDayColor = eventDayColor
-            ) { if (safeDate != null) onDateSelected(safeDate) }
-        }
-    }
-}
-
-@Composable
-fun DayHeaders(firstDayOfWeek: DayOfWeek) {
-    val days =
-        DayOfWeek.entries.drop(firstDayOfWeek.ordinal) + DayOfWeek.entries.take(firstDayOfWeek.ordinal)
-    Row(Modifier.fillMaxWidth()) {
-        days.forEach { day ->
-            Text(
-                text = day.name.take(3),
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-@Composable
-fun DayItem(
-    date: Int,
-    isSelected: Boolean,
-    isCurrentDay: Boolean,
-    hasEvent: Boolean,
-    selectedDayColor: Color,
-    currentDayColor: Color,
-    eventDayColor: Color,
-    onClick: () -> Unit
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Box(
-        modifier = Modifier
-            .size(40.dp)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) { if (date != 0) onClick() }
-            .background(
-                when {
-                    isSelected -> selectedDayColor
-                    isCurrentDay -> currentDayColor
-                    else -> Color.Transparent
-                },
-                shape = CircleShape
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = if (date == 0) "" else "$date",
-                color = if (isSelected || isCurrentDay) Color.White else Color.Black
-            )
-            if (hasEvent) Box(modifier = Modifier.size(5.dp).background(eventDayColor, CircleShape))
-        }
     }
 }
