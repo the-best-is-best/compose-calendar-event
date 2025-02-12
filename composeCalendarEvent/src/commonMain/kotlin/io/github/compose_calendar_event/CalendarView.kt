@@ -119,11 +119,12 @@ fun CalendarView(
                     modifier = Modifier.clickable { onDateSelected(selectedMonth) }
                         .padding(bottom = 8.dp)
                 )
-                Spacer(modifier = Modifier.size(8.dp))
-                if (isTwoWeeksSupport) {
-                    DropdownMenuToggle(!isMonthlyView) {
-                        isMonthlyView = !isMonthlyView
-                    }
+
+            }
+            Spacer(Modifier.weight(1f))
+            if (isTwoWeeksSupport) {
+                DropdownMenuToggle(!isMonthlyView) {
+                    isMonthlyView = !isMonthlyView
                 }
             }
             IconButton(onClick = {
