@@ -33,7 +33,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -80,14 +84,33 @@ fun CalendarView(
         daysOfMonth.subList(splitIndex, daysOfMonth.size)
     )
 
-    Column(modifier = Modifier.padding(16.dp).pointerInput(Unit) {
-        detectVerticalDragGestures { _, dragAmount ->
+    Column(modifier = Modifier.padding(16.dp)
+        .pointerInput(Unit) {
             if (isTwoWeeksSupport) {
-            isMonthlyView = dragAmount >= 0
-            currentHalf = 1
+                detectVerticalDragGestures { _, dragAmount ->
+                    if (isTwoWeeksSupport) {
+                        isMonthlyView = dragAmount >= 0
+                        currentHalf = 1
+                    }
+                }
             }
         }
-    }) {
+        .nestedScroll(remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(
+                    available: Offset,
+                    source: NestedScrollSource
+                ): Offset {
+                    if (isTwoWeeksSupport) {
+                        isMonthlyView = available.y >= 0
+                        currentHalf = 1
+                    }
+                    return Offset.Zero
+                }
+            }
+
+        })
+    ) {
         Row(
             modifier = headerModifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
