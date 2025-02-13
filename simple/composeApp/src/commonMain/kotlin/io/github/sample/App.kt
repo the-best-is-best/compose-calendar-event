@@ -14,16 +14,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.compose_calendar_event.monthly.CalendarView
+import io.github.compose_calendar_event.weekly.ComposeCalendarEvent
+import io.github.compose_calendar_event.weekly.WeeklyCalendar
 import io.github.sample.theme.AppTheme
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 
+
 @Composable
 internal fun App() = AppTheme {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,22 +41,56 @@ internal fun App() = AppTheme {
 fun CalendarScreen() {
     var selectedMonth by remember { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault())) }
 
-
-    CalendarView(
-        isTwoWeeksSupport = true,
-        selectedDate = selectedMonth,
-        eventDays = listOf(
-            LocalDate(2025, 2, 14),
-            LocalDate(2025, 2, 20),
-            LocalDate(2025, 3, 28)
+    val data = listOf(
+        ComposeCalendarEvent(
+            "Event #100232",
+            start = LocalDateTime(2025, 2, 14, 1, 15),
+            end = LocalDateTime(2025, 2, 14, 2, 45)
         ),
-        onMonthChanged = { newMonth ->
-            selectedMonth = newMonth
-        },
-        onDateSelected = { newDate ->
-            selectedMonth = newDate
-        },
 
-        firstDayOfWeek = DayOfWeek.MONDAY
+        ComposeCalendarEvent(
+            "Event 1",
+            start = LocalDateTime(2025, 2, 15, 1, 45),
+            end = LocalDateTime(2025, 2, 15, 3, 15)
+        ),
+        ComposeCalendarEvent(
+            "Event 1 2",
+            start = LocalDateTime(2025, 2, 15, 7, 10),
+            end = LocalDateTime(2025, 2, 15, 11, 10)
+        ),
+        ComposeCalendarEvent(
+            "Event 3",
+            start = LocalDateTime(2025, 3, 28, 3, 45),
+            end = LocalDateTime(2025, 3, 28, 7, 15)
+        )
+
+    )
+//    CalendarView(
+//        isTwoWeeksSupport = true,
+//        selectedDate = selectedMonth,
+//        eventDays = data.map { it.date },
+//        onMonthChanged = { newMonth ->
+//            selectedMonth = newMonth
+//        },
+//        onDateSelected = { newDate ->
+//            selectedMonth = newDate
+//        },
+//
+//        firstDayOfWeek = DayOfWeek.MONDAY,
+//
+//        displayItem = { date ->
+//            for (event in data) {
+//                if (event.date == date) {
+//                    Text(text = event.title)
+//                }
+//            }
+//        }
+//    )
+    WeeklyCalendar(
+        events = data,
+        currentDate = selectedMonth,
+        onDateSelected = {
+            selectedMonth = it
+        }
     )
 }
