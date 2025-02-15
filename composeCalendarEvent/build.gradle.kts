@@ -41,19 +41,19 @@ tasks.withType<PublishToMavenRepository> {
 
 
 extra["packageNameSpace"] = "io.github.compose_calendar_event"
-extra["groupId"] = "com.example"
-extra["artifactId"] = "your-artifact-id"
+extra["groupId"] = "io.github.the-best-is-best"
+extra["artifactId"] = "compose-calendar-event"
 extra["version"] = "1.0.0"
-extra["packageName"] = ""
-extra["packageUrl"] = ""
-extra["packageDescription"] = ""
+extra["packageName"] = "ComposeCalendarEvent"
+extra["packageUrl"] = "https://github.com/the-best-is-best/compose-calendar-event"
+extra["packageDescription"] =
+    "Compose Calendar Event is a **Compose Multiplatform** package that provides flexible calendar views to display events. It supports all platforms (Android, iOS, Desktop, Web) using only `kotlinx.datetime` for date handling."
 extra["system"] = "GITHUB"
-extra["issueUrl"] = ""
-extra["connectionGit"] = ".git"
-
-extra["developerName"] = ""
-extra["developerNameId"] = ""
-extra["developerEmail"] = ""
+extra["issueUrl"] = "https://github.com/the-best-is-best/compose-calendar-event/issues"
+extra["connectionGit"] = "https://github.com/the-best-is-best/compose-calendar-event.git"
+extra["developerName"] = "Michelle Raouf"
+extra["developerNameId"] = "MichelleRaouf"
+extra["developerEmail"] = "eng.michelle.raouf@gmail.com"
 
 
 mavenPublishing {
