@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,11 +14,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.compose_calendar_event.monthly.CalendarView
 import io.github.compose_calendar_event.weekly.ComposeCalendarEvent
+import io.github.compose_calendar_event.weekly.WeeklyCalendar
 import io.github.sample.theme.AppTheme
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -67,32 +65,32 @@ fun CalendarScreen() {
         )
 
     )
-    CalendarView(
-        isTwoWeeksSupport = true,
-        selectedDate = selectedMonth,
-        eventDays = data.map { it.start.date },
-        onMonthChanged = { newMonth ->
-            selectedMonth = newMonth
-        },
-        onDateSelected = { newDate ->
-            selectedMonth = newDate
-        },
-
-        firstDayOfWeek = DayOfWeek.MONDAY,
-
-        displayItem = { date ->
-            for (event in data) {
-                if (event.start.date == date) {
-                    Text(text = event.name)
-                }
-            }
-        }
-    )
-//    WeeklyCalendar(
-//        events = data,
-//        currentDate = selectedMonth,
-//        onDateSelected = {
-//            selectedMonth = it
+//    CalendarView(
+//        isTwoWeeksSupport = true,
+//        selectedDate = selectedMonth,
+//        eventDays = data.map { it.start.date },
+//        onMonthChanged = { newMonth ->
+//            selectedMonth = newMonth
+//        },
+//        onDateSelected = { newDate ->
+//            selectedMonth = newDate
+//        },
+//
+//        firstDayOfWeek = DayOfWeek.MONDAY,
+//
+//        displayItem = { date ->
+//            for (event in data) {
+//                if (event.start.date == date) {
+//                    Text(text = event.name)
+//                }
+//            }
 //        }
 //    )
+    WeeklyCalendar(
+        events = data,
+        currentDate = selectedMonth,
+        onDateSelected = {
+            selectedMonth = it
+        }
+    )
 }

@@ -1,7 +1,9 @@
 package io.github.compose_calendar_event.weekly
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,10 +23,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +54,7 @@ import androidx.compose.ui.unit.times
 import io.github.compose_calendar_event.utils.get3Days
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -56,6 +64,7 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeeklyCalendar(
     events: List<ComposeCalendarEvent>,
@@ -66,6 +75,7 @@ fun WeeklyCalendar(
     currentDayTextColor: Color = Color.White,
     onDateSelected: (LocalDate) -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     var accumulatedDragAmount by remember { mutableStateOf(0f) }
     var visibleStartDate by remember { mutableStateOf(currentDate) }
@@ -82,6 +92,37 @@ fun WeeklyCalendar(
     fun goToNext() {
         visibleStartDate = visibleStartDate.plus(DatePeriod(days = 3))
         onDateSelected(visibleStartDate)
+    }
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val millis = datePickerState.selectedDateMillis
+                    if (millis != null) {
+                        val newDate = Instant.fromEpochMilliseconds(millis)
+                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                        visibleStartDate = newDate
+
+                        onDateSelected(newDate)
+
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
     }
 
 
@@ -100,7 +141,11 @@ fun WeeklyCalendar(
                 )
             }
             Text(
-                modifier = headerModifier,
+                modifier = headerModifier
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) { showDatePicker = true },
                 text = "${visibleStartDate.month.name} ${visibleStartDate.year}",
                 style = headerTextStyle
             )

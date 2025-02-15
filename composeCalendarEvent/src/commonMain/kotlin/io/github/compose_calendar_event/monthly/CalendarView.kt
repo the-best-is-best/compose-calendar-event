@@ -3,6 +3,7 @@ package io.github.compose_calendar_event.monthly
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -73,6 +74,8 @@ fun CalendarView(
     }
     var isMonthlyView by remember { mutableStateOf(true) }
     var currentHalf by remember { mutableStateOf(1) }
+
+    val interactionSource = remember { MutableInteractionSource() }
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
 
@@ -121,7 +124,34 @@ fun CalendarView(
 
     var accumulatedDragAmount by remember { mutableStateOf(0f) }
 
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val millis = datePickerState.selectedDateMillis
+                    if (millis != null) {
+                        val newDate = Instant.fromEpochMilliseconds(millis)
+                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                        selectedMonth = LocalDate(newDate.year, newDate.month, 1)
+                        onMonthChanged(newDate)
+                        onDateSelected(newDate)
 
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)
             .pointerInput(Unit) {
@@ -185,15 +215,17 @@ fun CalendarView(
                 )
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "${selectedMonth.month.name} ${selectedMonth.year}",
                     style = headerTextStyle,
                     modifier = Modifier
-                        .clickable { showDatePicker = true }
-                        .padding(bottom = 8.dp)
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) { showDatePicker = true }
+
                 )
-            }
+
 
             if (isTwoWeeksSupport) {
                 Spacer(Modifier.weight(1f))
@@ -212,35 +244,7 @@ fun CalendarView(
             }
         }
 
-        // ✅ DatePickerDialog يظهر عند الضغط على الشهر
-        if (showDatePicker) {
-            DatePickerDialog(
-                onDismissRequest = { showDatePicker = false },
-                confirmButton = {
-                    TextButton(onClick = {
-                        val millis = datePickerState.selectedDateMillis
-                        if (millis != null) {
-                            val newDate = Instant.fromEpochMilliseconds(millis)
-                                .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                            selectedMonth = LocalDate(newDate.year, newDate.month, 1)
-                            onMonthChanged(newDate)
-                            onDateSelected(newDate)
 
-                        }
-                        showDatePicker = false
-                    }) {
-                        Text("OK")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDatePicker = false }) {
-                        Text("Cancel")
-                    }
-                }
-            ) {
-                DatePicker(state = datePickerState)
-            }
-        }
 
         DayHeaders(firstDayOfWeek)
         MonthCalendar(
