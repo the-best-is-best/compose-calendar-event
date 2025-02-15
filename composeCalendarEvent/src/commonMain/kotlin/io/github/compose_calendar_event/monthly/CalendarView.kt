@@ -1,12 +1,13 @@
 package io.github.compose_calendar_event.monthly
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -62,9 +63,11 @@ fun CalendarView(
     headerTextStyle: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.bodyMedium,
     selectedDayColor: Color = Color.Blue,
     currentDayColor: Color = Color.Green,
+    currentDayTextColor: Color = Color.White,
     eventDayColor: Color = Color.Red,
     displayItem: @Composable (LocalDate) -> Unit
 ) {
+
     var selectedMonth by remember {
         mutableStateOf(LocalDate(selectedDate.year, selectedDate.month, 1))
     }
@@ -82,17 +85,68 @@ fun CalendarView(
         daysOfMonth.subList(splitIndex, daysOfMonth.size)
     )
 
+
+    fun goToPrev(
+
+    ) {
+        if (isMonthlyView) {
+            selectedMonth = selectedMonth.minus(DatePeriod(months = 1))
+            onMonthChanged(selectedMonth)
+        } else {
+            if (currentHalf == 2) {
+                currentHalf = 1
+            } else {
+                currentHalf = 2
+                selectedMonth = selectedMonth.minus(DatePeriod(months = 1))
+                onMonthChanged(selectedMonth)
+            }
+        }
+    }
+
+    fun goToNext(
+    ) {
+        if (isMonthlyView) {
+            selectedMonth = selectedMonth.plus(DatePeriod(months = 1))
+            onMonthChanged(selectedMonth)
+        } else {
+            if (currentHalf == 1) {
+                currentHalf = 2
+            } else {
+                currentHalf = 1
+                selectedMonth = selectedMonth.plus(DatePeriod(months = 1))
+                onMonthChanged(selectedMonth)
+            }
+        }
+    }
+
+    var accumulatedDragAmount by remember { mutableStateOf(0f) }
+
+
     Column(
-        modifier = Modifier.fillMaxHeight().fillMaxWidth().padding(16.dp)
+        modifier = Modifier.fillMaxSize().padding(16.dp)
             .pointerInput(Unit) {
                 if (isTwoWeeksSupport) {
                     detectVerticalDragGestures { _, dragAmount ->
                         if (isTwoWeeksSupport) {
-                            isMonthlyView = dragAmount >= 0
+                            isMonthlyView = dragAmount >= 20
                             currentHalf = 1
                         }
                     }
                 }
+            }
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        when {
+                            accumulatedDragAmount > 200 -> goToPrev()
+                            accumulatedDragAmount < -200 -> goToNext()
+                        }
+                        accumulatedDragAmount = 0f
+                    },
+                    onHorizontalDrag = { _, dragAmount ->
+                        accumulatedDragAmount += dragAmount
+                    }
+                )
             }
             .nestedScroll(remember {
                 object : NestedScrollConnection {
@@ -100,9 +154,17 @@ fun CalendarView(
                         available: Offset,
                         source: NestedScrollSource
                     ): Offset {
+
                         if (isTwoWeeksSupport) {
-                            isMonthlyView = available.y >= 0
-                            currentHalf = 1
+                            if (available.y > 20) {
+                                isMonthlyView = true
+                                currentHalf = 1
+                            } else if (available.y < -20) {
+                                isMonthlyView = false
+                                currentHalf = 1
+
+                            }
+
                         }
                         return Offset.Zero
                     }
@@ -115,18 +177,7 @@ fun CalendarView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = {
-                if (isMonthlyView) {
-                    selectedMonth = selectedMonth.minus(DatePeriod(months = 1))
-                    onMonthChanged(selectedMonth)
-                } else {
-                    if (currentHalf == 2) {
-                        currentHalf = 1
-                    } else {
-                        currentHalf = 2
-                        selectedMonth = selectedMonth.minus(DatePeriod(months = 1))
-                        onMonthChanged(selectedMonth)
-                    }
-                }
+                goToPrev()
             }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -152,18 +203,7 @@ fun CalendarView(
             }
 
             IconButton(onClick = {
-                if (isMonthlyView) {
-                    selectedMonth = selectedMonth.plus(DatePeriod(months = 1))
-                    onMonthChanged(selectedMonth)
-                } else {
-                    if (currentHalf == 1) {
-                        currentHalf = 2
-                    } else {
-                        currentHalf = 1
-                        selectedMonth = selectedMonth.plus(DatePeriod(months = 1))
-                        onMonthChanged(selectedMonth)
-                    }
-                }
+                goToNext()
             }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -210,6 +250,7 @@ fun CalendarView(
             selectedDate = selectedDate,
             selectedDayColor = selectedDayColor,
             currentDayColor = currentDayColor,
+            currentDayTextColor = currentDayTextColor,
             eventDayColor = eventDayColor,
         )
 
@@ -221,5 +262,6 @@ fun CalendarView(
             }
         }
     }
-}
 
+
+}

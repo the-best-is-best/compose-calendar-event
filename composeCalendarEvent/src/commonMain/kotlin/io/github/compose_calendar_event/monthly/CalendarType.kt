@@ -13,7 +13,7 @@ import androidx.compose.runtime.setValue
 
 
 @Composable
-fun CalendarType(isTwoWeeksView: Boolean, onSelectionChange: (Boolean) -> Unit) {
+internal fun CalendarType(isTwoWeeksView: Boolean, onSelectionChange: (Boolean) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
     Box {
         TextButton(onClick = { expanded = true }) {

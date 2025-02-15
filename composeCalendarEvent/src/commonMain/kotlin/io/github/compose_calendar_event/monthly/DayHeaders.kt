@@ -10,7 +10,7 @@ import kotlinx.datetime.DayOfWeek
 
 
 @Composable
-fun DayHeaders(firstDayOfWeek: DayOfWeek) {
+internal fun DayHeaders(firstDayOfWeek: DayOfWeek) {
     val days =
         DayOfWeek.entries.drop(firstDayOfWeek.ordinal) + DayOfWeek.entries.take(firstDayOfWeek.ordinal)
     Row(Modifier.fillMaxWidth()) {

@@ -15,13 +15,14 @@ import kotlinx.datetime.todayIn
 
 
 @Composable
-fun MonthCalendar(
+internal fun MonthCalendar(
     days: List<Int>,
     eventDays: List<LocalDate>,
     onDateSelected: (LocalDate) -> Unit,
     selectedDate: LocalDate,
     selectedDayColor: Color,
     currentDayColor: Color,
+    currentDayTextColor: Color,
     eventDayColor: Color
 ) {
     LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = Modifier.padding(top = 8.dp)) {
@@ -36,6 +37,7 @@ fun MonthCalendar(
                 hasEvent = hasEvent,
                 selectedDayColor = selectedDayColor,
                 currentDayColor = currentDayColor,
+                currentDayTextColor = currentDayTextColor,
                 eventDayColor = eventDayColor
             ) { if (safeDate != null) onDateSelected(safeDate) }
         }

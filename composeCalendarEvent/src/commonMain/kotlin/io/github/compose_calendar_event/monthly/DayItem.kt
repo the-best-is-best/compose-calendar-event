@@ -17,13 +17,15 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun DayItem(
+internal fun DayItem(
     date: Int,
     isSelected: Boolean,
     isCurrentDay: Boolean,
     hasEvent: Boolean,
     selectedDayColor: Color,
     currentDayColor: Color,
+    currentDayTextColor: Color,
+
     eventDayColor: Color,
     onClick: () -> Unit
 ) {
@@ -49,7 +51,7 @@ fun DayItem(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = if (date == 0) "" else "$date",
-                color = if (isSelected || isCurrentDay) Color.White else Color.Black
+                color = if (isSelected) currentDayTextColor else if (isCurrentDay) currentDayTextColor else Color.Black
             )
             if (hasEvent) Box(modifier = Modifier.size(5.dp).background(eventDayColor, CircleShape))
         }
