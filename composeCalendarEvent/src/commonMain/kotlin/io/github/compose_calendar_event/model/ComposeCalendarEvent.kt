@@ -1,4 +1,4 @@
-package io.github.compose_calendar_event.weekly
+package io.github.compose_calendar_event.model
 
 import androidx.compose.ui.graphics.Color
 import kotlinx.datetime.LocalDateTime

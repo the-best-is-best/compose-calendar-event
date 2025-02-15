@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.compose_calendar_event.utils.get3Days
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
