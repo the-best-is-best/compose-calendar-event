@@ -160,7 +160,9 @@ fun WeeklyCalendar(
         }
 
         Row(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.width(60.dp).verticalScroll(scrollState).offset(y = 40.dp)) {
+            Column(
+                modifier = Modifier.width(60.dp).verticalScroll(scrollState).padding(top = 40.dp)
+            ) {
                 hours.forEach { hour ->
                     Box(modifier = Modifier.height(60.dp).padding(horizontal = 4.dp)) {
                         if (hour != 0)
