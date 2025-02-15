@@ -160,13 +160,18 @@ fun WeeklyCalendar(
         }
 
         Row(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.width(60.dp).verticalScroll(scrollState).padding(top = 40.dp)
+            Box(
+                modifier = Modifier.padding(top = 50.dp)
             ) {
-                hours.forEach { hour ->
-                    Box(modifier = Modifier.height(60.dp).padding(horizontal = 4.dp)) {
-                        if (hour != 0)
-                        Text(text = "$hour:00", style = TextStyle(fontSize = 12.sp))
+                Column(
+                    modifier = Modifier.width(60.dp).verticalScroll(scrollState)
+
+                ) {
+                    hours.forEach { hour ->
+                        Box(modifier = Modifier.height(60.dp).padding(horizontal = 4.dp)) {
+                            if (hour != 0)
+                                Text(text = "$hour:00", style = TextStyle(fontSize = 12.sp))
+                        }
                     }
                 }
             }
