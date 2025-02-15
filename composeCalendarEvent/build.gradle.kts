@@ -43,7 +43,7 @@ tasks.withType<PublishToMavenRepository> {
 extra["packageNameSpace"] = "io.github.compose_calendar_event"
 extra["groupId"] = "io.github.the-best-is-best"
 extra["artifactId"] = "compose-calendar-event"
-extra["version"] = "1.0.0"
+extra["version"] = "1.0.1"
 extra["packageName"] = "ComposeCalendarEvent"
 extra["packageUrl"] = "https://github.com/the-best-is-best/compose-calendar-event"
 extra["packageDescription"] =
@@ -63,7 +63,7 @@ mavenPublishing {
         extra["version"].toString()
     )
 
-    publishToMavenCentral(SonatypeHost.S01)
+    publishToMavenCentral(SonatypeHost.S01, true)
     signAllPublications()
 
     pom {

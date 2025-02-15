@@ -1,4 +1,4 @@
-package io.github.compose_calendar_event.weekly
+package io.github.compose_calendar_event.three_days
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -67,15 +67,17 @@ import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeeklyCalendar(
+fun ThreeDaysCalendar(
     events: List<ComposeCalendarEvent>,
     currentDate: LocalDate,
     headerModifier: Modifier = Modifier,
     headerTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     currentDayColor: Color = Color.Green,
     currentDayTextColor: Color = Color.White,
-    onDateSelected: (LocalDate) -> Unit
-) {
+    onDateSelected: (LocalDate) -> Unit,
+    onEventClick: (ComposeCalendarEvent) -> Unit,
+
+    ) {
     val interactionSource = remember { MutableInteractionSource() }
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     var accumulatedDragAmount by remember { mutableStateOf(0f) }
@@ -252,7 +254,11 @@ fun WeeklyCalendar(
                                 }
                             }
                             events.filter { it.start.date == day }
-                                .forEach { event -> EventView(event) }
+                                .forEach { event ->
+                                    EventView(
+                                        event,
+                                        onClick = { onEventClick(event) })
+                                }
                         }
                     }
                 }
@@ -262,7 +268,7 @@ fun WeeklyCalendar(
 }
 
 @Composable
-private fun EventView(event: ComposeCalendarEvent) {
+private fun EventView(event: ComposeCalendarEvent, onClick: () -> Unit) {
     val eventOffset = calculateEventOffset(event.start)
     val eventHeight = calculateEventHeight(event.start, event.end)
 
@@ -272,6 +278,12 @@ private fun EventView(event: ComposeCalendarEvent) {
             .offset(y = eventOffset)
             .height(eventHeight)
             .background(event.color)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                onClick()
+            }
     ) {
 
         Text(

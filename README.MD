@@ -34,47 +34,6 @@ Compose Calendar Event is available on `mavenCentral()`.
 ## 🛠 Usage
 
 ```kotlin
-package io.github.sample
-
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import io.github.compose_calendar_event.model.ComposeCalendarEvent
-import io.github.compose_calendar_event.monthly.CalendarView
-import io.github.compose_calendar_event.schedule.ScheduleView
-import io.github.compose_calendar_event.weekly.WeeklyCalendar
-import io.github.sample.theme.AppTheme
-import kotlinx.datetime.Clock
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 
 enum class CalendarType {
     MONTHLY, ThreeDays, SCHEDULED
@@ -233,7 +192,13 @@ fun MyMonthlyCalendar(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp, horizontal = 8.dp),
+                            .padding(vertical = 4.dp, horizontal = 8.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                println("event clicked is $event")
+                            },
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                         colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = event.color)
                     ) {
@@ -265,13 +230,16 @@ fun MyWeeklyView(
 ) {
     var _selectedMonth by remember { mutableStateOf(selectedMonth) }
 
-    WeeklyCalendar(
+    ThreeDaysCalendar(
         events = data,
         currentDate = _selectedMonth,
         currentDayTextColor = Color.White,
         currentDayColor = Color.Blue,
         onDateSelected = {
             _selectedMonth = it
+        },
+        onEventClick = {
+            println("event clicked is $it")
         }
     )
 }
@@ -280,7 +248,12 @@ fun MyWeeklyView(
 fun MyScheduledCalendar(
     data: List<ComposeCalendarEvent>
 ) {
-    ScheduleView(events = data)
+    ScheduleView(
+        events = data,
+        onEventClick = {
+            println("event clicked is $it")
+        }
+    )
 
 }
 ```

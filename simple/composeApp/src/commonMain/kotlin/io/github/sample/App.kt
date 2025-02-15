@@ -1,5 +1,7 @@
 package io.github.sample
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -31,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.compose_calendar_event.monthly.CalendarView
 import io.github.compose_calendar_event.schedule.ScheduleView
-import io.github.compose_calendar_event.weekly.WeeklyCalendar
+import io.github.compose_calendar_event.three_days.ThreeDaysCalendar
 import io.github.sample.theme.AppTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
@@ -197,7 +199,13 @@ fun MyMonthlyCalendar(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp, horizontal = 8.dp),
+                            .padding(vertical = 4.dp, horizontal = 8.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                println("event clicked is $event")
+                            },
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
                         colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = event.color)
                     ) {
@@ -229,13 +237,16 @@ fun MyWeeklyView(
 ) {
     var _selectedMonth by remember { mutableStateOf(selectedMonth) }
 
-    WeeklyCalendar(
+    ThreeDaysCalendar(
         events = data,
         currentDate = _selectedMonth,
         currentDayTextColor = Color.White,
         currentDayColor = Color.Blue,
         onDateSelected = {
             _selectedMonth = it
+        },
+        onEventClick = {
+            println("event clicked is $it")
         }
     )
 }
@@ -244,6 +255,11 @@ fun MyWeeklyView(
 fun MyScheduledCalendar(
     data: List<ComposeCalendarEvent>
 ) {
-    ScheduleView(events = data)
+    ScheduleView(
+        events = data,
+        onEventClick = {
+            println("event clicked is $it")
+        }
+    )
 
 }
