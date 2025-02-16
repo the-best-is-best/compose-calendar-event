@@ -5,6 +5,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +41,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.compose_calendar_event.utils.getDaysOfMonth
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
@@ -56,7 +59,7 @@ import kotlinx.datetime.todayIn
 fun CalendarView(
     isTwoWeeksSupport: Boolean = true,
     selectedDate: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
-    eventDays: List<LocalDate> = emptyList(),
+    events: List<ComposeCalendarEvent>,
     onDateSelected: (LocalDate) -> Unit = {},
     onMonthChanged: (LocalDate) -> Unit = {},
     firstDayOfWeek: DayOfWeek = DayOfWeek.SUNDAY,
@@ -66,8 +69,10 @@ fun CalendarView(
     currentDayColor: Color = Color.Green,
     currentDayTextColor: Color = Color.White,
     eventDayColor: Color = Color.Red,
-    displayItem: @Composable (LocalDate) -> Unit
-) {
+    displayItem: (@Composable (ComposeCalendarEvent) -> Unit)? = null,
+    onEventClick: (ComposeCalendarEvent) -> Unit,
+
+    ) {
 
     var selectedMonth by remember {
         mutableStateOf(LocalDate(selectedDate.year, selectedDate.month, 1))
@@ -215,16 +220,16 @@ fun CalendarView(
                 )
             }
 
-                Text(
-                    text = "${selectedMonth.month.name} ${selectedMonth.year}",
-                    style = headerTextStyle,
-                    modifier = Modifier
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null
-                        ) { showDatePicker = true }
+            Text(
+                text = "${selectedMonth.month.name} ${selectedMonth.year}",
+                style = headerTextStyle,
+                modifier = Modifier
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) { showDatePicker = true }
 
-                )
+            )
 
 
             if (isTwoWeeksSupport) {
@@ -249,7 +254,7 @@ fun CalendarView(
         DayHeaders(firstDayOfWeek)
         MonthCalendar(
             days = if (isMonthlyView) daysOfMonth else splitDays[currentHalf - 1],
-            eventDays = eventDays,
+            events = events,
             onDateSelected = onDateSelected,
             selectedDate = selectedDate,
             selectedDayColor = selectedDayColor,
@@ -261,9 +266,46 @@ fun CalendarView(
         Spacer(Modifier.height(30.dp))
 
         LazyColumn {
-            item {
-                displayItem(selectedDate)
+            val filterEvents = events.filter { it.start.date == selectedDate }
+            items(filterEvents.size) { index ->
+                val displayEvent = filterEvents[index]
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) { onEventClick(displayEvent) } // Click outside displayItem will work
+                        .padding(vertical = 4.dp, horizontal = 8.dp)
+                ) {
+                    if (displayItem != null) {
+                        displayItem(displayEvent) // Custom UI for the event
+                    } else {
+                        Card(
+                            modifier = Modifier.fillParentMaxWidth(),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                            colors = androidx.compose.material3.CardDefaults.cardColors(
+                                containerColor = displayEvent.color
+                            )
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text(
+                                    text = displayEvent.name,
+                                    color = displayEvent.textColor,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "${displayEvent.start.hour}:${displayEvent.start.minute} - ${displayEvent.end.hour}:${displayEvent.end.minute}",
+                                    color = displayEvent.textColor.copy(alpha = 0.8f),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    }
+                }
             }
+
+
         }
     }
 

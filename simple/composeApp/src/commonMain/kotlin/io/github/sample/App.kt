@@ -1,14 +1,16 @@
 package io.github.sample
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -18,6 +20,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -69,7 +72,7 @@ fun CalendarScreen() {
 
     val data = listOf(
         ComposeCalendarEvent(
-
+            id = 1,
             "Event #100232",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
@@ -78,6 +81,7 @@ fun CalendarScreen() {
         ),
 
         ComposeCalendarEvent(
+            id = 2,
             "Event 1",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
@@ -85,6 +89,7 @@ fun CalendarScreen() {
             end = LocalDateTime(2025, 2, 15, 3, 15)
         ),
         ComposeCalendarEvent(
+            id = 3,
             "Event 1 2",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
@@ -92,6 +97,7 @@ fun CalendarScreen() {
             end = LocalDateTime(2025, 2, 15, 11, 10)
         ),
         ComposeCalendarEvent(
+            id = 4,
             "Event 3",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
@@ -99,6 +105,7 @@ fun CalendarScreen() {
             end = LocalDateTime(2025, 3, 26, 7, 15)
         ),
         ComposeCalendarEvent(
+            id = 5,
             "Event 3 1",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
@@ -106,6 +113,7 @@ fun CalendarScreen() {
             end = LocalDateTime(2025, 3, 28, 7, 15)
         ),
         ComposeCalendarEvent(
+            id = 6,
             "Event 3 2",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
@@ -183,48 +191,52 @@ fun MyMonthlyCalendar(
         currentDayTextColor = Color.White,
         currentDayColor = Color.Blue,
 
-        eventDays = data.map { it.start.date },
+        events = data,
         onMonthChanged = { newMonth ->
             _selectedMonth = newMonth
         },
         onDateSelected = { newDate ->
             _selectedMonth = newDate
         },
+        onEventClick = {
+            println("event clicked is $it")
+        },
 
         firstDayOfWeek = DayOfWeek.MONDAY,
-
-        displayItem = { date ->
-            Column {
-                data.filter { it.start.date == date }.forEach { event ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp, horizontal = 8.dp)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                println("event clicked is $event")
-                            },
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = event.color)
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Text(
-                                text = event.name,
-                                color = event.textColor,
-                                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                text = "${event.start.hour}:${event.start.minute} - ${event.end.hour}:${event.end.minute}",
-                                color = event.textColor.copy(alpha = 0.8f),
-                                style = androidx.compose.material3.MaterialTheme.typography.bodySmall
-                            )
-                        }
+        displayItem = {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                colors = androidx.compose.material3.CardDefaults.cardColors(
+                    containerColor = it.color
+                )
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Change Calendar Type",
+                        tint = it.textColor
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = it.name,
+                            color = it.textColor,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "${it.start.hour}:${it.start.minute} - ${it.end.hour}:${it.end.minute}",
+                            color = it.textColor.copy(alpha = 0.8f),
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                 }
             }
         }
+
 
     )
 

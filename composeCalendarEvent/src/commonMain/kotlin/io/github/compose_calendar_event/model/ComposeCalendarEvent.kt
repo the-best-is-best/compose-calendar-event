@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import kotlinx.datetime.LocalDateTime
 
 data class ComposeCalendarEvent(
+    val id: Any,
     val name: String,
     val color: Color = Color.Green,
     val textColor: Color = Color.Black,

@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -17,11 +18,12 @@ import kotlinx.datetime.todayIn
 @Composable
 internal fun MonthCalendar(
     days: List<Int>,
-    eventDays: List<LocalDate>,
+    events: List<ComposeCalendarEvent>,
     onDateSelected: (LocalDate) -> Unit,
     selectedDate: LocalDate,
     selectedDayColor: Color,
     currentDayColor: Color,
+
     currentDayTextColor: Color,
     eventDayColor: Color
 ) {
@@ -29,7 +31,9 @@ internal fun MonthCalendar(
         items(days) { date ->
             val safeDate =
                 runCatching { LocalDate(selectedDate.year, selectedDate.month, date) }.getOrNull()
-            val hasEvent = safeDate != null && eventDays.contains(safeDate)
+            val hasEvent = safeDate != null && events.any { event ->
+                event.start.date == safeDate
+            }
             DayItem(
                 date = date,
                 isSelected = safeDate == selectedDate,
