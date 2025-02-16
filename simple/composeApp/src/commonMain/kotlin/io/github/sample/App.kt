@@ -269,6 +269,39 @@ fun MyScheduledCalendar(
 ) {
     ScheduleView(
         events = data,
+        displayItem = {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
+                colors = androidx.compose.material3.CardDefaults.cardColors(
+                    containerColor = it.color
+                )
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Change Calendar Type",
+                        tint = it.textColor
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = it.name,
+                            color = it.textColor,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = "${it.start.hour}:${it.start.minute} - ${it.end.hour}:${it.end.minute}",
+                            color = it.textColor.copy(alpha = 0.8f),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+        },
         onEventClick = {
             println("event clicked is $it")
         }

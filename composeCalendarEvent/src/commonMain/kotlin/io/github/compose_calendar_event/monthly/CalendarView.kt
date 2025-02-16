@@ -265,7 +265,9 @@ fun CalendarView(
 
         Spacer(Modifier.height(30.dp))
 
-        LazyColumn {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             val filterEvents = events.filter { it.start.date == selectedDate }
             items(filterEvents.size) { index ->
                 val displayEvent = filterEvents[index]
@@ -276,7 +278,6 @@ fun CalendarView(
                             interactionSource = interactionSource,
                             indication = null
                         ) { onEventClick(displayEvent) } // Click outside displayItem will work
-                        .padding(vertical = 4.dp, horizontal = 8.dp)
                 ) {
                     if (displayItem != null) {
                         displayItem(displayEvent) // Custom UI for the event

@@ -3,6 +3,8 @@ package io.github.compose_calendar_event.schedule
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,13 +31,17 @@ fun ScheduleView(
     dayOfWeekModifier: Modifier = Modifier.fillMaxWidth()
         .background(Color.LightGray)
         .padding(8.dp),
+    dayOfWeekTextStyle: TextStyle? = null,
     onEventClick: (ComposeCalendarEvent) -> Unit,
+    displayItem: (@Composable (ComposeCalendarEvent) -> Unit)? = null
 
-    dayOfWeekTextStyle: TextStyle? = null
 ) {
     val groupedEvents = events.groupBy { it.start.date } // Group by date
 
-    LazyColumn(modifier = Modifier.padding(16.dp)) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.padding(16.dp)
+    ) {
         var lastMonth: Month? = null
 
         groupedEvents.forEach { (date, dayEvents) ->
@@ -43,7 +49,7 @@ fun ScheduleView(
             if (date.month != lastMonth) {
                 item {
                     Text(
-                        text = "📅 ${date.month.name} ${date.year}",
+                        text = "${date.month.name} ${date.year}",
                         style = headerTextStyle ?: TextStyle(
                             color = Color.Blue,
                             fontWeight = FontWeight.Bold
@@ -57,7 +63,7 @@ fun ScheduleView(
 
             item {
                 Text(
-                    text = "📆 ${date.dayOfWeek.name}, $date",
+                    text = "${date.dayOfWeek.name}, $date",
                     style = dayOfWeekTextStyle ?: TextStyle(fontWeight = FontWeight.Bold),
                     modifier = dayOfWeekModifier
 
@@ -65,22 +71,31 @@ fun ScheduleView(
             }
 
             items(dayEvents) { event ->
-                EventItem(event, onClick = { onEventClick(event) })
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { onEventClick(event) } // Click outside displayItem will work
+                ) {
+                    if (displayItem != null) {
+                        displayItem(event)
+                    } else {
+                        EventItem(event)
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-private fun EventItem(event: ComposeCalendarEvent, onClick: () -> Unit) {
+private fun EventItem(event: ComposeCalendarEvent) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onClick() },
+            .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = event.color)
     ) {
