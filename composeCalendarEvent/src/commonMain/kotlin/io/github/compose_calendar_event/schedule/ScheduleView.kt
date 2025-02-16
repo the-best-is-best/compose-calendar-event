@@ -55,7 +55,7 @@ fun ScheduleView(
                             fontWeight = FontWeight.Bold
                         ),
 
-                        modifier = headerModifier.padding(vertical = 8.dp)
+                        modifier = headerModifier
                     )
                 }
                 lastMonth = date.month
