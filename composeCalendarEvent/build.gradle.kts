@@ -43,7 +43,7 @@ tasks.withType<PublishToMavenRepository> {
 extra["packageNameSpace"] = "io.github.compose_calendar_event"
 extra["groupId"] = "io.github.the-best-is-best"
 extra["artifactId"] = "compose-calendar-event"
-extra["version"] = "1.0.1"
+extra["version"] = "1.1.0"
 extra["packageName"] = "ComposeCalendarEvent"
 extra["packageUrl"] = "https://github.com/the-best-is-best/compose-calendar-event"
 extra["packageDescription"] =
