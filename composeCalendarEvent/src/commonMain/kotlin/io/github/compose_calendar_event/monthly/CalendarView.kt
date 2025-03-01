@@ -18,15 +18,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Card
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +39,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.compose_calendar_event.utils.getDaysOfMonth
+import io.github.tcompose_date_picker.TKDatePicker
+import io.github.tcompose_date_picker.config.TextFieldType
+import io.github.tcompose_date_picker.extensions.toEpochMillis
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
@@ -57,6 +56,7 @@ import kotlinx.datetime.todayIn
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarView(
+    useAdaptive: Boolean = false,
     isTwoWeeksSupport: Boolean = true,
     selectedDate: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
     events: List<ComposeCalendarEvent>,
@@ -71,6 +71,7 @@ fun CalendarView(
     eventDayColor: Color = Color.Red,
     displayItem: (@Composable (ComposeCalendarEvent) -> Unit)? = null,
     onEventClick: (ComposeCalendarEvent) -> Unit,
+    isDialogOpen: (Boolean) -> Unit,
 
     ) {
 
@@ -81,8 +82,6 @@ fun CalendarView(
     var currentHalf by remember { mutableStateOf(1) }
 
     val interactionSource = remember { MutableInteractionSource() }
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
 
     val daysOfMonth = getDaysOfMonth(selectedMonth, firstDayOfWeek)
     val totalWeeks = daysOfMonth.size / 7
@@ -129,34 +128,6 @@ fun CalendarView(
 
     var accumulatedDragAmount by remember { mutableStateOf(0f) }
 
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    val millis = datePickerState.selectedDateMillis
-                    if (millis != null) {
-                        val newDate = Instant.fromEpochMilliseconds(millis)
-                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                        selectedMonth = LocalDate(newDate.year, newDate.month, 1)
-                        onMonthChanged(newDate)
-                        onDateSelected(newDate)
-
-                    }
-                    showDatePicker = false
-                }) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)
             .pointerInput(Unit) {
@@ -220,16 +191,32 @@ fun CalendarView(
                 )
             }
 
-            Text(
-                text = "${selectedMonth.month.name} ${selectedMonth.year}",
-                style = headerTextStyle,
-                modifier = Modifier
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) { showDatePicker = true }
+            TKDatePicker(
+                useAdaptive = useAdaptive,
+                textFieldType = TextFieldType.Custom { modifier ->
+                    Text(
+                        text = "${selectedMonth.month.name} ${selectedMonth.year}",
+                        style = headerTextStyle,
+                        modifier = modifier
 
-            )
+
+                    )
+                },
+                onDateSelected = {
+                    val millis = it?.toEpochMillis()
+                    if (millis != null) {
+                        val newDate = Instant.fromEpochMilliseconds(millis)
+                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                        selectedMonth = LocalDate(newDate.year, newDate.month, 1)
+                        onMonthChanged(newDate)
+                        onDateSelected(newDate)
+                    }
+
+                },
+                onDismiss = {},
+                isDialogOpen = isDialogOpen,
+
+                )
 
 
             if (isTwoWeeksSupport) {

@@ -1,4 +1,5 @@
 [versions]
+compose_date_time_picker = "3.2.1"
 kotlin = "2.1.10"
 compose = "1.7.3"
 agp = "8.7.1"
@@ -15,6 +16,7 @@ maven-publish = "0.30.0"
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-uitest-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-uiTest" }
 androidx-uitest-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidx-uiTest" }
+compose_date_time_picker = { module = "io.github.the-best-is-best:compose_date_time_picker", version.ref = "compose_date_time_picker" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 
 [plugins]

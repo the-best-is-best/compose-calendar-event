@@ -23,15 +23,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +49,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.compose_calendar_event.utils.get3Days
+import io.github.tcompose_date_picker.TKDatePicker
+import io.github.tcompose_date_picker.config.TextFieldType
+import io.github.tcompose_date_picker.extensions.toEpochMillis
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.Instant
@@ -70,15 +69,16 @@ import kotlin.time.Duration
 fun ThreeDaysCalendar(
     events: List<ComposeCalendarEvent>,
     currentDate: LocalDate,
+    useAdaptive: Boolean = false,
     headerModifier: Modifier = Modifier,
     headerTextStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     currentDayColor: Color = Color.Green,
     currentDayTextColor: Color = Color.White,
     onDateSelected: (LocalDate) -> Unit,
     onEventClick: (ComposeCalendarEvent) -> Unit,
+    isDialogOpen: (Boolean) -> Unit,
 
     ) {
-    val interactionSource = remember { MutableInteractionSource() }
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     var accumulatedDragAmount by remember { mutableStateOf(0f) }
     var visibleStartDate by remember { mutableStateOf(currentDate) }
@@ -96,42 +96,40 @@ fun ThreeDaysCalendar(
         visibleStartDate = visibleStartDate.plus(DatePeriod(days = 3))
         onDateSelected(visibleStartDate)
     }
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    val millis = datePickerState.selectedDateMillis
-                    if (millis != null) {
-                        val newDate = Instant.fromEpochMilliseconds(millis)
-                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                        visibleStartDate = newDate
-
-                        onDateSelected(newDate)
-
-                    }
-                    showDatePicker = false
-                }) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
+//
+//    if (showDatePicker) {
+//        DatePickerDialog(
+//            onDismissRequest = { showDatePicker = false },
+//            confirmButton = {
+//                TextButton(onClick = {
+//                    val millis = datePickerState.selectedDateMillis
+//                    if (millis != null) {
+//                        val newDate = Instant.fromEpochMilliseconds(millis)
+//                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+//                        visibleStartDate = newDate
+//
+//                        onDateSelected(newDate)
+//
+//                    }
+//                    showDatePicker = false
+//                }) {
+//                    Text("OK")
+//                }
+//            },
+//            dismissButton = {
+//                TextButton(onClick = { showDatePicker = false }) {
+//                    Text("Cancel")
+//                }
+//            }
+//        ) {
+//            DatePicker(state = datePickerState)
+//        }
+//    }
 
 
     Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = headerModifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -143,15 +141,36 @@ fun ThreeDaysCalendar(
                     contentDescription = "Previous"
                 )
             }
-            Text(
-                modifier = headerModifier
-                    .clickable(
-                        interactionSource = interactionSource,
-                        indication = null
-                    ) { showDatePicker = true },
-                text = "${visibleStartDate.month.name} ${visibleStartDate.year}",
-                style = headerTextStyle
-            )
+            TKDatePicker(
+                useAdaptive = useAdaptive,
+                textFieldType = TextFieldType.Custom { modifier ->
+                    Text(
+                        text = "${visibleStartDate.month.name} ${visibleStartDate.year}",
+                        style = headerTextStyle,
+                        modifier = modifier
+
+
+                    )
+                },
+                onDateSelected = {
+                    val millis = it?.toEpochMillis()
+                    if (millis != null) {
+                        val newDate = Instant.fromEpochMilliseconds(millis)
+                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                        visibleStartDate = newDate
+
+                        onDateSelected(newDate)
+
+
+                    }
+
+
+                },
+                onDismiss = {},
+                isDialogOpen = isDialogOpen,
+
+                )
+
             IconButton(onClick = {
                 goToNext()
             }) {

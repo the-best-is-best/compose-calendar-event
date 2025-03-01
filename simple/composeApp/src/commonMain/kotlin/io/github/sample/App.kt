@@ -72,6 +72,23 @@ fun CalendarScreen() {
 
     val data = listOf(
         ComposeCalendarEvent(
+            id = 6,
+            "Event #16100232",
+            color = Color(0xFF1CB0F9),
+            textColor = Color.White,
+            start = LocalDateTime(2025, 1, 14, 1, 15),
+            end = LocalDateTime(2025, 1, 14, 2, 45)
+        ),
+
+        ComposeCalendarEvent(
+            id = 7,
+            "Event 16",
+            color = Color(0xFF1CB0F9),
+            textColor = Color.White,
+            start = LocalDateTime(2025, 1, 15, 1, 45),
+            end = LocalDateTime(2025, 1, 15, 3, 15)
+        ),
+        ComposeCalendarEvent(
             id = 1,
             "Event #100232",
             color = Color(0xFF1CB0F9),
@@ -119,7 +136,42 @@ fun CalendarScreen() {
             textColor = Color.White,
             start = LocalDateTime(2025, 3, 21, 3, 45),
             end = LocalDateTime(2025, 3, 21, 7, 15)
-        )
+        ),
+
+        ComposeCalendarEvent(
+            id = 7,
+            "Event #17100232",
+            color = Color(0xFF1CB0F9),
+            textColor = Color.White,
+            start = LocalDateTime(2025, 4, 14, 1, 15),
+            end = LocalDateTime(2025, 4, 14, 2, 45)
+        ),
+
+        ComposeCalendarEvent(
+            id = 8,
+            "Event 18",
+            color = Color(0xFF1CB0F9),
+            textColor = Color.White,
+            start = LocalDateTime(2025, 4, 15, 1, 45),
+            end = LocalDateTime(2025, 4, 15, 3, 15)
+        ),
+        ComposeCalendarEvent(
+            id = 9,
+            "Event #19100232",
+            color = Color(0xFF1CB0F9),
+            textColor = Color.White,
+            start = LocalDateTime(2025, 5, 14, 1, 15),
+            end = LocalDateTime(2025, 5, 14, 2, 45)
+        ),
+
+        ComposeCalendarEvent(
+            id = 10,
+            "Event 10",
+            color = Color(0xFF1CB0F9),
+            textColor = Color.White,
+            start = LocalDateTime(2025, 5, 15, 1, 45),
+            end = LocalDateTime(2025, 5, 15, 3, 15)
+        ),
     )
 
     Scaffold(
@@ -186,6 +238,7 @@ fun MyMonthlyCalendar(
 ) {
     var _selectedMonth by remember { mutableStateOf(selectedMonth) }
     CalendarView(
+        useAdaptive = true,
         isTwoWeeksSupport = true,
         selectedDate = _selectedMonth,
         currentDayTextColor = Color.White,
@@ -203,6 +256,7 @@ fun MyMonthlyCalendar(
         },
 
         firstDayOfWeek = DayOfWeek.MONDAY,
+        isDialogOpen = {},
         displayItem = {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -250,6 +304,7 @@ fun MyWeeklyView(
     var _selectedMonth by remember { mutableStateOf(selectedMonth) }
 
     ThreeDaysCalendar(
+        useAdaptive = true,
         events = data,
         currentDate = _selectedMonth,
         currentDayTextColor = Color.White,
@@ -257,6 +312,7 @@ fun MyWeeklyView(
         onDateSelected = {
             _selectedMonth = it
         },
+        isDialogOpen = {},
         onEventClick = {
             println("event clicked is $it")
         }
@@ -304,7 +360,8 @@ fun MyScheduledCalendar(
         },
         onEventClick = {
             println("event clicked is $it")
-        }
+        },
+        isDialogOpen = {},
     )
 
 }
