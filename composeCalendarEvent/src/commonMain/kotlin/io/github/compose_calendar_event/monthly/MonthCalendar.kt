@@ -17,6 +17,7 @@ import kotlinx.datetime.todayIn
 
 @Composable
 internal fun MonthCalendar(
+    modifier: Modifier,
     days: List<Int>,
     events: List<ComposeCalendarEvent>,
     onDateSelected: (LocalDate) -> Unit,
@@ -27,7 +28,7 @@ internal fun MonthCalendar(
     currentDayTextColor: Color,
     eventDayColor: Color
 ) {
-    LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = Modifier.padding(top = 8.dp)) {
+    LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = modifier.padding(top = 8.dp)) {
         items(days) { date ->
             val safeDate =
                 runCatching { LocalDate(selectedDate.year, selectedDate.month, date) }.getOrNull()

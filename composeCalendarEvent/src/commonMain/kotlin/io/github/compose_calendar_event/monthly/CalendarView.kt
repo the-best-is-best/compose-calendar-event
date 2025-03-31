@@ -130,52 +130,7 @@ fun CalendarView(
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)
-            .pointerInput(Unit) {
-                if (isTwoWeeksSupport) {
-                    detectVerticalDragGestures { _, dragAmount ->
-                        if (isTwoWeeksSupport) {
-                            isMonthlyView = dragAmount >= 20
-                            currentHalf = 1
-                        }
-                    }
-                }
-            }
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onDragEnd = {
-                        when {
-                            accumulatedDragAmount > 200 -> goToPrev()
-                            accumulatedDragAmount < -200 -> goToNext()
-                        }
-                        accumulatedDragAmount = 0f
-                    },
-                    onHorizontalDrag = { _, dragAmount ->
-                        accumulatedDragAmount += dragAmount
-                    }
-                )
-            }
-            .nestedScroll(remember {
-                object : NestedScrollConnection {
-                    override fun onPreScroll(
-                        available: Offset,
-                        source: NestedScrollSource
-                    ): Offset {
 
-                        if (isTwoWeeksSupport) {
-                            if (available.y > 20) {
-                                isMonthlyView = true
-                                currentHalf = 1
-                            } else if (available.y < -20) {
-                                isMonthlyView = false
-                                currentHalf = 1
-
-                            }
-
-                        }
-                        return Offset.Zero
-                    }
-                }
-            })
     ) {
         Row(
             modifier = headerModifier.fillMaxWidth(),
@@ -240,6 +195,52 @@ fun CalendarView(
 
         DayHeaders(firstDayOfWeek)
         MonthCalendar(
+            modifier = Modifier.pointerInput(Unit) {
+                if (isTwoWeeksSupport) {
+                    detectVerticalDragGestures { _, dragAmount ->
+                        if (isTwoWeeksSupport) {
+                            isMonthlyView = dragAmount >= 20
+                            currentHalf = 1
+                        }
+                    }
+                }
+            }
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            when {
+                                accumulatedDragAmount > 200 -> goToPrev()
+                                accumulatedDragAmount < -200 -> goToNext()
+                            }
+                            accumulatedDragAmount = 0f
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            accumulatedDragAmount += dragAmount
+                        }
+                    )
+                }
+                .nestedScroll(remember {
+                    object : NestedScrollConnection {
+                        override fun onPreScroll(
+                            available: Offset,
+                            source: NestedScrollSource
+                        ): Offset {
+
+                            if (isTwoWeeksSupport) {
+                                if (available.y > 20) {
+                                    isMonthlyView = true
+                                    currentHalf = 1
+                                } else if (available.y < -20) {
+                                    isMonthlyView = false
+                                    currentHalf = 1
+
+                                }
+
+                            }
+                            return Offset.Zero
+                        }
+                    }
+                }),
             days = if (isMonthlyView) daysOfMonth else splitDays[currentHalf - 1],
             events = events,
             onDateSelected = onDateSelected,
