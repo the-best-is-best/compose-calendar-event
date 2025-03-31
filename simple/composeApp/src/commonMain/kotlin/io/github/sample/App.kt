@@ -222,7 +222,7 @@ fun CalendarScreen() {
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             when (calendarType) {
-                CalendarType.MONTHLY -> MyMonthlyCalendar(data, selectedMonth)
+                CalendarType.MONTHLY -> MyMonthlyCalendar(data)
                 CalendarType.ThreeDays -> MyWeeklyView(data, selectedMonth)
                 CalendarType.SCHEDULED -> MyScheduledCalendar(data)
             }
@@ -230,31 +230,28 @@ fun CalendarScreen() {
     }
 }
 
-
 @Composable
 fun MyMonthlyCalendar(
     data: List<ComposeCalendarEvent>,
-    selectedMonth: LocalDate,
 ) {
-    var _selectedMonth by remember { mutableStateOf(selectedMonth) }
+    var selectedMonth by remember { mutableStateOf(Clock.System.todayIn(TimeZone.currentSystemDefault())) }
     CalendarView(
+        selectedMonth = selectedMonth,
         useAdaptive = true,
         isTwoWeeksSupport = true,
-        selectedDate = _selectedMonth,
+        selectedDate = selectedMonth,
         currentDayTextColor = Color.White,
         currentDayColor = Color.Blue,
-
         events = data,
         onMonthChanged = { newMonth ->
-            _selectedMonth = newMonth
+            selectedMonth = newMonth // Will update from both drag and buttons
         },
         onDateSelected = { newDate ->
-            _selectedMonth = newDate
+            selectedMonth = newDate
         },
         onEventClick = {
             println("event clicked is $it")
         },
-
         firstDayOfWeek = DayOfWeek.MONDAY,
         isDialogOpen = {},
         displayItem = {
@@ -290,10 +287,7 @@ fun MyMonthlyCalendar(
                 }
             }
         }
-
-
     )
-
 }
 
 @Composable

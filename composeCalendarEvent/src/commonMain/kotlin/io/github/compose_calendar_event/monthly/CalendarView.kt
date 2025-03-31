@@ -52,10 +52,10 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarView(
+    selectedMonth: LocalDate,
     useAdaptive: Boolean = false,
     isTwoWeeksSupport: Boolean = true,
     selectedDate: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
@@ -72,18 +72,13 @@ fun CalendarView(
     displayItem: (@Composable (ComposeCalendarEvent) -> Unit)? = null,
     onEventClick: (ComposeCalendarEvent) -> Unit,
     isDialogOpen: (Boolean) -> Unit,
-
-    ) {
-
-    var selectedMonth by remember {
-        mutableStateOf(LocalDate(selectedDate.year, selectedDate.month, 1))
-    }
+) {
     var isMonthlyView by remember { mutableStateOf(true) }
     var currentHalf by remember { mutableStateOf(1) }
+    var currentMonth by remember { mutableStateOf(selectedMonth) } // Track current month
 
     val interactionSource = remember { MutableInteractionSource() }
-
-    val daysOfMonth = getDaysOfMonth(selectedMonth, firstDayOfWeek)
+    val daysOfMonth = getDaysOfMonth(currentMonth, firstDayOfWeek)
     val totalWeeks = daysOfMonth.size / 7
     val firstHalfWeeks = totalWeeks / 2
     val splitIndex = firstHalfWeeks * 7
@@ -92,55 +87,80 @@ fun CalendarView(
         daysOfMonth.subList(splitIndex, daysOfMonth.size)
     )
 
-
-    fun goToPrev(
-
-    ) {
-        if (isMonthlyView) {
-            selectedMonth = selectedMonth.minus(DatePeriod(months = 1))
-            onMonthChanged(selectedMonth)
-        } else {
-            if (currentHalf == 2) {
-                currentHalf = 1
-            } else {
-                currentHalf = 2
-                selectedMonth = selectedMonth.minus(DatePeriod(months = 1))
-                onMonthChanged(selectedMonth)
-            }
-        }
-    }
-
-    fun goToNext(
-    ) {
-        if (isMonthlyView) {
-            selectedMonth = selectedMonth.plus(DatePeriod(months = 1))
-            onMonthChanged(selectedMonth)
-        } else {
-            if (currentHalf == 1) {
-                currentHalf = 2
-            } else {
-                currentHalf = 1
-                selectedMonth = selectedMonth.plus(DatePeriod(months = 1))
-                onMonthChanged(selectedMonth)
-            }
-        }
-    }
-
-    var accumulatedDragAmount by remember { mutableStateOf(0f) }
-
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)
-            .pointerInput(Unit) {
-                if (isTwoWeeksSupport) {
-                    detectVerticalDragGestures { _, dragAmount ->
-                        if (isTwoWeeksSupport) {
-                            isMonthlyView = dragAmount >= 20
-                            currentHalf = 1
-                        }
+    ) {
+        Row(
+            modifier = headerModifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = {
+                val newMonth = goToPrev(
+                    isMonthlyView = isMonthlyView,
+                    selectedMonth = currentMonth,
+                    onMonthChanged = { currentMonth = it; onMonthChanged(it) },
+                    currentHalf = currentHalf,
+                    onChangeHalf = { currentHalf = it }
+                )
+                if (newMonth != null) currentMonth = newMonth
+            }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Previous"
+                )
+            }
+
+            TKDatePicker(
+                useAdaptive = useAdaptive,
+                textFieldType = TextFieldType.Custom { modifier ->
+                    Text(
+                        text = "${currentMonth.month.name} ${currentMonth.year}",
+                        style = headerTextStyle,
+                        modifier = modifier
+                    )
+                },
+                onDateSelected = {
+                    val millis = it?.toEpochMillis()
+                    if (millis != null) {
+                        val newDate = Instant.fromEpochMilliseconds(millis)
+                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                        currentMonth = newDate
+                        onMonthChanged(newDate)
+                        onDateSelected(newDate)
                     }
+                },
+                onDismiss = {},
+                isDialogOpen = isDialogOpen,
+            )
+
+            if (isTwoWeeksSupport) {
+                Spacer(Modifier.weight(1f))
+                CalendarType(!isMonthlyView) {
+                    isMonthlyView = !isMonthlyView
                 }
             }
-            .pointerInput(Unit) {
+
+            IconButton(onClick = {
+                val newMonth = goToNext(
+                    isMonthlyView = isMonthlyView,
+                    selectedMonth = currentMonth,
+                    onMonthChanged = { currentMonth = it; onMonthChanged(it) },
+                    currentHalf = currentHalf,
+                    onChangeHalf = { currentHalf = it }
+                )
+                if (newMonth != null) currentMonth = newMonth
+            }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Next"
+                )
+            }
+        }
+
+        DayHeaders(firstDayOfWeek)
+        Box(
+            modifier = Modifier.pointerInput(Unit) {
                 detectHorizontalDragGestures(
                     onDragEnd = {
                         when {
@@ -154,102 +174,29 @@ fun CalendarView(
                     }
                 )
             }
-            .nestedScroll(remember {
-                object : NestedScrollConnection {
-                    override fun onPreScroll(
-                        available: Offset,
-                        source: NestedScrollSource
-                    ): Offset {
-
-                        if (isTwoWeeksSupport) {
-                            if (available.y > 20) {
-                                isMonthlyView = true
-                                currentHalf = 1
-                            } else if (available.y < -20) {
-                                isMonthlyView = false
-                                currentHalf = 1
-
-                            }
-
-                        }
-                        return Offset.Zero
-                    }
-                }
-            })
-    ) {
-        Row(
-            modifier = headerModifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {
-                goToPrev()
-            }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Previous"
-                )
-            }
-
-            TKDatePicker(
-                useAdaptive = useAdaptive,
-                textFieldType = TextFieldType.Custom { modifier ->
-                    Text(
-                        text = "${selectedMonth.month.name} ${selectedMonth.year}",
-                        style = headerTextStyle,
-                        modifier = modifier
-
-
-                    )
+            MonthCalendar(
+                days = if (isMonthlyView) daysOfMonth else splitDays[currentHalf - 1],
+                events = events,
+                onDateSelected = onDateSelected,
+                selectedDate = selectedDate,
+                selectedDayColor = selectedDayColor,
+                currentDayColor = currentDayColor,
+                currentDayTextColor = currentDayTextColor,
+                eventDayColor = eventDayColor,
+                isMonthlyView = isMonthlyView,
+                selectedMonth = currentMonth,
+                onSelectedMonth = { newMonth ->
+                    currentMonth = newMonth
+                    onMonthChanged(newMonth)
                 },
-                onDateSelected = {
-                    val millis = it?.toEpochMillis()
-                    if (millis != null) {
-                        val newDate = Instant.fromEpochMilliseconds(millis)
-                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                        selectedMonth = LocalDate(newDate.year, newDate.month, 1)
-                        onMonthChanged(newDate)
-                        onDateSelected(newDate)
-                    }
+                currentHalf = currentHalf,
+                onChangeCurrentHalf = { currentHalf = it },
+                isTwoWeeksSupport = isTwoWeeksSupport,
+                onChangeMonthlyView = { isMonthlyView = it }
+            )
 
-                },
-                onDismiss = {},
-                isDialogOpen = isDialogOpen,
-
-                )
-
-
-            if (isTwoWeeksSupport) {
-                Spacer(Modifier.weight(1f))
-                CalendarType(!isMonthlyView) {
-                    isMonthlyView = !isMonthlyView
-                }
-            }
-
-            IconButton(onClick = {
-                goToNext()
-            }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Next"
-                )
-            }
         }
-
-
-
-        DayHeaders(firstDayOfWeek)
-        MonthCalendar(
-            days = if (isMonthlyView) daysOfMonth else splitDays[currentHalf - 1],
-            events = events,
-            onDateSelected = onDateSelected,
-            selectedDate = selectedDate,
-            selectedDayColor = selectedDayColor,
-            currentDayColor = currentDayColor,
-            currentDayTextColor = currentDayTextColor,
-            eventDayColor = eventDayColor,
-        )
-
         Spacer(Modifier.height(30.dp))
 
         LazyColumn(
@@ -264,10 +211,10 @@ fun CalendarView(
                         .clickable(
                             interactionSource = interactionSource,
                             indication = null
-                        ) { onEventClick(displayEvent) } // Click outside displayItem will work
+                        ) { onEventClick(displayEvent) }
                 ) {
                     if (displayItem != null) {
-                        displayItem(displayEvent) // Custom UI for the event
+                        displayItem(displayEvent)
                     } else {
                         Card(
                             modifier = Modifier.fillParentMaxWidth(),
@@ -292,10 +239,6 @@ fun CalendarView(
                     }
                 }
             }
-
-
         }
     }
-
-
 }
