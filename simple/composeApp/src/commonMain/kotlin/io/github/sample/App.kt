@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.compose_calendar_event.monthly.CalendarView
@@ -325,6 +326,11 @@ fun MyScheduledCalendar(
 ) {
     ScheduleView(
         events = data,
+        headerText = "Current date",
+        headerTextStyle = TextStyle(
+            color = Color.Magenta
+        ),
+
         displayItem = {
             Card(
                 modifier = Modifier.fillMaxWidth(),

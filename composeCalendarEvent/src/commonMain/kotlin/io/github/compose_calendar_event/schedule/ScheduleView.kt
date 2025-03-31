@@ -1,12 +1,12 @@
 package io.github.compose_calendar_event.schedule
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,7 +43,6 @@ import kotlinx.datetime.toLocalDateTime
 internal annotation class ExperimentalScheduleView
 
 @OptIn(ExperimentalMaterial3Api::class)
-
 @ExperimentalScheduleView
 @Composable
 fun ScheduleView(
@@ -60,19 +59,18 @@ fun ScheduleView(
     onEventClick: (ComposeCalendarEvent) -> Unit,
     displayItem: (@Composable (ComposeCalendarEvent) -> Unit)? = null,
     isDialogOpen: (Boolean) -> Unit,
+    headerText: String = "Select Date",
 ) {
     val groupedEvents = events.groupBy { it.start.date }
     val lazyListState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    // تعيين selectedDate إلى التاريخ الحالي
     var selectedDate by remember {
         mutableStateOf(
             Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         )
     }
 
-    // التمرير إلى أقرب تاريخ عند بدء التشغيل
     LaunchedEffect(Unit) {
         val availableDates = groupedEvents.keys.sorted()
         var index = availableDates.indexOfFirst { it == selectedDate }
@@ -92,46 +90,60 @@ fun ScheduleView(
 
     Column {
         if (isAutoScrollEnabled) {
-            TKDatePicker(
-                useAdaptive = useAdaptive,
-                textFieldType = TextFieldType.Custom { modifier ->
-                    Text(
-                        text = "${selectedDate.month.name} ${selectedDate.year}",
-                        style = headerTextStyle,
-                        modifier = modifier
-                    )
-                },
-                onDateSelected = { epochMillis ->
-                    if (epochMillis != null) {
-                        val instant = Instant.fromEpochMilliseconds(epochMillis.toEpochMillis())
-                        selectedDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+            // Use custom headerContent if provided, otherwise use default
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text(
+                    text = headerText,
+                    style = headerTextStyle,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 16.dp)
+                )
+                TKDatePicker(
+                    useAdaptive = useAdaptive,
+                    textFieldType = TextFieldType.Custom { modifier ->
+                        Text(
+                            text = "${selectedDate.month.name} ${selectedDate.year}",
+                            style = headerTextStyle,
+                            modifier = modifier
+                        )
+                    },
+                    onDateSelected = { epochMillis ->
+                        if (epochMillis != null) {
+                            val instant = Instant.fromEpochMilliseconds(epochMillis.toEpochMillis())
+                            selectedDate =
+                                instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-                        val availableDates = groupedEvents.keys.sorted()
-                        var index = availableDates.indexOfFirst { it == selectedDate }
+                            val availableDates = groupedEvents.keys.sorted()
+                            var index = availableDates.indexOfFirst { it == selectedDate }
 
-                        if (index == -1) {
-                            index = availableDates.indexOfFirst { it > selectedDate }
-                        }
+                            if (index == -1) {
+                                index = availableDates.indexOfFirst { it > selectedDate }
+                            }
 
-                        if (index == -1) {
-                            index = availableDates.indexOfLast { it < selectedDate }
-                        }
+                            if (index == -1) {
+                                index = availableDates.indexOfLast { it < selectedDate }
+                            }
 
-                        if (index != -1) {
-                            val previousDaysCount =
-                                availableDates.take(index).sumOf { groupedEvents[it]?.size ?: 0 }
-                            val offset = index * 2 // عنصران إضافيان لكل يوم (الشهر + اليوم)
-                            val finalIndex = previousDaysCount + offset
+                            if (index != -1) {
+                                val previousDaysCount =
+                                    availableDates.take(index)
+                                        .sumOf { groupedEvents[it]?.size ?: 0 }
+                                val offset = index * 2
+                                val finalIndex = previousDaysCount + offset
 
-                            scope.launch {
-                                lazyListState.animateScrollToItem(finalIndex)
+                                scope.launch {
+                                    lazyListState.animateScrollToItem(finalIndex)
+                                }
                             }
                         }
-                    }
-                },
-                onDismiss = {},
-                isDialogOpen = isDialogOpen
-            )
+                    },
+                    onDismiss = {},
+                    isDialogOpen = isDialogOpen
+                )
+            }
         }
 
         LazyColumn(
@@ -181,7 +193,6 @@ fun ScheduleView(
         }
     }
 }
-
 
 @Composable
 private fun EventItem(event: ComposeCalendarEvent) {
