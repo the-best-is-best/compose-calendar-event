@@ -28,7 +28,7 @@ It supports all platforms (Android, iOS, Desktop, Web) using only `kotlinx.datet
 ## 📦 Installation
 
 ```kotlin
-   implementation("io.github.the-best-is-best:compose-calendar-event:2.0.1")
+   implementation("io.github.the-best-is-best:compose-calendar-event:2.0.2")
 ```
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.the-best-is-best/compose-calendar-event)](https://central.sonatype.com/artifact/io.github.the-best-is-best/compose-calendar-event)

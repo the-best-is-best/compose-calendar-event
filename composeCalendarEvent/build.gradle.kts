@@ -43,7 +43,7 @@ tasks.withType<PublishToMavenRepository> {
 extra["packageNameSpace"] = "io.github.compose_calendar_event"
 extra["groupId"] = "io.github.the-best-is-best"
 extra["artifactId"] = "compose-calendar-event"
-extra["version"] = "2.0.1"
+extra["version"] = "2.0.2"
 extra["packageName"] = "ComposeCalendarEvent"
 extra["packageUrl"] = "https://github.com/the-best-is-best/compose-calendar-event"
 extra["packageDescription"] =
@@ -138,11 +138,10 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.compose.date.time.picker)
+            implementation(compose.materialIconsExtended)
 
-            implementation(libs.kotlinx.datetime)
+            api(libs.compose.date.time.picker)
+            api(libs.kotlinx.datetime)
 
         }
 
