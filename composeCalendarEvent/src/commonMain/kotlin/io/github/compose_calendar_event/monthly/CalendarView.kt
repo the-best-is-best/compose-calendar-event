@@ -41,24 +41,25 @@ import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.compose_calendar_event.utils.getDaysOfMonth
 import io.github.tcompose_date_picker.TKDatePicker
 import io.github.tcompose_date_picker.config.TextFieldType
+import io.github.tcompose_date_picker.extensions.now
 import io.github.tcompose_date_picker.extensions.toEpochMillis
-import kotlinx.datetime.Clock
+import io.github.tcompose_date_picker.extensions.toLocalDate
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.todayIn
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun CalendarView(
     useAdaptive: Boolean = false,
     isTwoWeeksSupport: Boolean = true,
-    selectedDate: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
+    selectedDate: LocalDate = LocalDate.now(),
     events: List<ComposeCalendarEvent>,
     onDateSelected: (LocalDate) -> Unit = {},
     onMonthChanged: (LocalDate) -> Unit = {},
@@ -161,7 +162,7 @@ fun CalendarView(
                     val millis = it?.toEpochMillis()
                     if (millis != null) {
                         val newDate = Instant.fromEpochMilliseconds(millis)
-                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                            .toLocalDate(TimeZone.currentSystemDefault())
                         selectedMonth = LocalDate(newDate.year, newDate.month, 1)
                         onMonthChanged(newDate)
                         onDateSelected(newDate)

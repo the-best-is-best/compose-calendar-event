@@ -51,10 +51,10 @@ import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.compose_calendar_event.utils.get3Days
 import io.github.tcompose_date_picker.TKDatePicker
 import io.github.tcompose_date_picker.config.TextFieldType
+import io.github.tcompose_date_picker.extensions.now
 import io.github.tcompose_date_picker.extensions.toEpochMillis
-import kotlinx.datetime.Clock
+import io.github.tcompose_date_picker.extensions.toLocalDate
 import kotlinx.datetime.DatePeriod
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -63,8 +63,10 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun ThreeDaysCalendar(
     events: List<ComposeCalendarEvent>,
@@ -79,7 +81,7 @@ fun ThreeDaysCalendar(
     isDialogOpen: (Boolean) -> Unit,
 
     ) {
-    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val today = LocalDate.now()
     var accumulatedDragAmount by remember { mutableStateOf(0f) }
     var visibleStartDate by remember { mutableStateOf(currentDate) }
     val daysOfWeek = remember(visibleStartDate) { visibleStartDate.get3Days() }
@@ -96,35 +98,6 @@ fun ThreeDaysCalendar(
         visibleStartDate = visibleStartDate.plus(DatePeriod(days = 3))
         onDateSelected(visibleStartDate)
     }
-//
-//    if (showDatePicker) {
-//        DatePickerDialog(
-//            onDismissRequest = { showDatePicker = false },
-//            confirmButton = {
-//                TextButton(onClick = {
-//                    val millis = datePickerState.selectedDateMillis
-//                    if (millis != null) {
-//                        val newDate = Instant.fromEpochMilliseconds(millis)
-//                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
-//                        visibleStartDate = newDate
-//
-//                        onDateSelected(newDate)
-//
-//                    }
-//                    showDatePicker = false
-//                }) {
-//                    Text("OK")
-//                }
-//            },
-//            dismissButton = {
-//                TextButton(onClick = { showDatePicker = false }) {
-//                    Text("Cancel")
-//                }
-//            }
-//        ) {
-//            DatePicker(state = datePickerState)
-//        }
-//    }
 
 
     Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
@@ -156,7 +129,7 @@ fun ThreeDaysCalendar(
                     val millis = it?.toEpochMillis()
                     if (millis != null) {
                         val newDate = Instant.fromEpochMilliseconds(millis)
-                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                            .toLocalDate(TimeZone.currentSystemDefault())
                         visibleStartDate = newDate
 
                         onDateSelected(newDate)
@@ -329,6 +302,7 @@ private fun calculateEventOffset(startTime: LocalDateTime): Dp {
     return totalMinutes * minuteHeight
 }
 
+@OptIn(ExperimentalTime::class)
 private fun calculateDuration(startTime: LocalDateTime, endTime: LocalDateTime): Duration {
     val startInstant = startTime.toInstant(TimeZone.UTC)
     val endInstant = endTime.toInstant(TimeZone.UTC)

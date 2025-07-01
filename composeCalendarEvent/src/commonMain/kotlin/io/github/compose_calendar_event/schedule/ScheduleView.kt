@@ -32,17 +32,20 @@ import androidx.compose.ui.unit.dp
 import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.tcompose_date_picker.TKDatePicker
 import io.github.tcompose_date_picker.config.TextFieldType
+import io.github.tcompose_date_picker.extensions.now
 import io.github.tcompose_date_picker.extensions.toEpochMillis
+import io.github.tcompose_date_picker.extensions.toLocalDate
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 internal annotation class ExperimentalScheduleView
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @ExperimentalScheduleView
 @Composable
 fun ScheduleView(
@@ -67,7 +70,7 @@ fun ScheduleView(
 
     var selectedDate by remember {
         mutableStateOf(
-            Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+            LocalDateTime.now().date
         )
     }
 
@@ -114,7 +117,7 @@ fun ScheduleView(
                         if (epochMillis != null) {
                             val instant = Instant.fromEpochMilliseconds(epochMillis.toEpochMillis())
                             selectedDate =
-                                instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+                                instant.toLocalDate(TimeZone.currentSystemDefault())
 
                             val availableDates = groupedEvents.keys.sorted()
                             var index = availableDates.indexOfFirst { it == selectedDate }
