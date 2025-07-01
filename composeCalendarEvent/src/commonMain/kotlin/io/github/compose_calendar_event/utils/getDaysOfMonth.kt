@@ -10,7 +10,7 @@ import kotlinx.datetime.plus
 internal fun getDaysOfMonth(date: LocalDate, firstDayOfWeek: DayOfWeek): List<Int> {
     val firstDayOfMonth = LocalDate(date.year, date.month, 1)
     val lastDay =
-        firstDayOfMonth.plus(DatePeriod(months = 1)).minus(DatePeriod(days = 1)).dayOfMonth
+        firstDayOfMonth.plus(DatePeriod(months = 1)).minus(DatePeriod(days = 1)).day
 
     val startDayOffset = (firstDayOfMonth.dayOfWeek.ordinal - firstDayOfWeek.ordinal + 7) % 7
     val days = mutableListOf<Int>().apply {

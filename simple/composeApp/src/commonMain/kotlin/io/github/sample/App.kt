@@ -39,12 +39,13 @@ import io.github.compose_calendar_event.monthly.CalendarView
 import io.github.compose_calendar_event.schedule.ScheduleView
 import io.github.compose_calendar_event.three_days.ThreeDaysCalendar
 import io.github.sample.theme.AppTheme
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 enum class CalendarType {
     MONTHLY, ThreeDays, SCHEDULED
@@ -65,7 +66,7 @@ internal fun App() = AppTheme {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun CalendarScreen() {
     val selectedMonth = Clock.System.todayIn(TimeZone.currentSystemDefault())

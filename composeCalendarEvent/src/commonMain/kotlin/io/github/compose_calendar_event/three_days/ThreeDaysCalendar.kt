@@ -210,7 +210,7 @@ fun ThreeDaysCalendar(
                                     )
                                 )
                                 Text(
-                                    text = "${day.dayOfMonth}",
+                                    text = "${day.day}",
                                     style = TextStyle(
                                         fontSize = 12.sp,
                                         textAlign = TextAlign.Center,
