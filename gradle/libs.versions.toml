@@ -8,9 +8,6 @@ androidx-uiTest = "1.8.3"
 kotlinxDatetime = "0.7.1"
 maven-publish = "0.34.0"
 
-
-
-
 [libraries]
 
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }

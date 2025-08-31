@@ -42,11 +42,11 @@ tasks.withType<PublishToMavenRepository> {
 extra["packageNameSpace"] = "io.github.compose_calendar_event"
 extra["groupId"] = "io.github.the-best-is-best"
 extra["artifactId"] = "compose-calendar-event"
-extra["version"] = "2.1.1"
+extra["version"] = "2.1.2"
 extra["packageName"] = "ComposeCalendarEvent"
 extra["packageUrl"] = "https://github.com/the-best-is-best/compose-calendar-event"
 extra["packageDescription"] =
-    "Compose Calendar Event is a **Compose Multiplatform** package that provides flexible calendar views to display events. It supports all platforms (Android, iOS, Desktop, Web) using only `kotlinx.datetime` for date handling."
+    "Compose Calendar Event is a Compose Multiplatform** package that provides flexible calendar views to display events. It supports all platforms (Android, iOS, Desktop, Web) using only `kotlinx.datetime` for date handling."
 extra["system"] = "GITHUB"
 extra["issueUrl"] = "https://github.com/the-best-is-best/compose-calendar-event/issues"
 extra["connectionGit"] = "https://github.com/the-best-is-best/compose-calendar-event.git"
