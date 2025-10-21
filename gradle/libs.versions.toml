@@ -1,10 +1,10 @@
 [versions]
-compose_date_time_picker = "3.5.0"
-kotlin = "2.2.10"
-compose = "1.8.2"
-agp = "8.12.1"
-androidx-activityCompose = "1.10.1"
-androidx-uiTest = "1.8.3"
+compose_date_time_picker = "3.7.0"
+kotlin = "2.2.20"
+compose = "1.9.1"
+agp = "8.13.0"
+androidx-activityCompose = "1.11.0"
+androidx-uiTest = "1.9.3"
 kotlinxDatetime = "0.7.1"
 maven-publish = "0.34.0"
 
