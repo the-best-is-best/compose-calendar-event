@@ -11,7 +11,7 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     id("maven-publish")
     id("signing")
     alias(libs.plugins.maven.publish)
@@ -42,7 +42,7 @@ tasks.withType<PublishToMavenRepository> {
 extra["packageNameSpace"] = "io.github.compose_calendar_event"
 extra["groupId"] = "io.github.the-best-is-best"
 extra["artifactId"] = "compose-calendar-event"
-extra["version"] = "2.2.0"
+extra["version"] = "2.2.2"
 extra["packageName"] = "ComposeCalendarEvent"
 extra["packageUrl"] = "https://github.com/the-best-is-best/compose-calendar-event"
 extra["packageDescription"] =
@@ -104,10 +104,7 @@ val packageNameSpace = extra["packageNameSpace"].toString()
 
 kotlin {
     jvmToolchain(17)
-    androidTarget {
-        //https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
-        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
-    }
+
 
     jvm()
 
@@ -134,24 +131,18 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
+            implementation(libs.runtime)
+            implementation(libs.foundation)
+            implementation(libs.material3)
+            implementation(libs.material.icons.extended)
 
             api(libs.compose.date.time.picker)
             api(libs.kotlinx.datetime)
 
         }
 
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            @OptIn(ExperimentalComposeLibrary::class)
-            implementation(compose.uiTest)
-        }
-
         androidMain.dependencies {
-            implementation(compose.uiTooling)
+            implementation(libs.ui.tooling)
             implementation(libs.androidx.activityCompose)
         }
 
@@ -160,42 +151,25 @@ kotlin {
         }
 
         jsMain.dependencies {
-            implementation(compose.html.core)
+            implementation(libs.html.core)
         }
 
         iosMain.dependencies {
         }
 
     }
-}
 
 
-android {
-    namespace = extra["packageNameSpace"].toString()
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 21
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
-        }
-        buildFeatures {
-            //enables a Compose tooling support in the AndroidStudio
-            compose = true
-        }
+    android {
+        namespace = project.extra["packageNameSpace"].toString()
+        compileSdk = 36
+        minSdk = 24
     }
+
 }
 
-//https://developer.android.com/develop/ui/compose/testing#setup
-dependencies {
-    androidTestImplementation(libs.androidx.uitest.junit4)
-    debugImplementation(libs.androidx.uitest.testManifest)
-    //temporary fix: https://youtrack.jetbrains.com/issue/CMP-5864
-    androidTestImplementation("androidx.test:monitor") {
-        version { strictly("1.6.1") }
-    }
-}
+
+
 compose.desktop {
     application {
         mainClass = "MainKt"

@@ -53,7 +53,7 @@ enum class CalendarType {
 
 
 @Composable
-internal fun App() = AppTheme {
+ fun App() = AppTheme {
 
     Column(
         modifier = Modifier

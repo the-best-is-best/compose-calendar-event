@@ -31,4 +31,5 @@ dependencyResolutionManagement {
     }
 }
 include(":composeCalendarEvent")
-include(":simple:composeApp")
+include(":simple:sharedUI")
+include(":simple:androidSimple")

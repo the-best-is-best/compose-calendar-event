@@ -10,15 +10,11 @@ plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose)
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
 }
 
 kotlin {
     jvmToolchain(17)
-    androidTarget {
-        //https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
-        instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
-    }
 
     jvm()
 
@@ -41,25 +37,20 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.material3)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.runtime)
+            implementation(libs.foundation)
+            implementation(libs.material.icons.extended)
+            implementation(libs.material3)
+            implementation(libs.components.resources)
+            implementation(libs.jetbrains.ui.tooling.preview)
 
             implementation(libs.kotlinx.datetime)
             implementation(project(":composeCalendarEvent"))
         }
 
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            @OptIn(ExperimentalComposeLibrary::class)
-            implementation(compose.uiTest)
-        }
 
         androidMain.dependencies {
-            implementation(compose.uiTooling)
+            implementation(libs.ui.tooling)
             implementation(libs.androidx.activityCompose)
         }
 
@@ -71,34 +62,17 @@ kotlin {
         }
 
     }
-}
 
-
-android {
-    namespace = "io.github.sample"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 21
-        targetSdk = 36
-
-        applicationId = "org.company.app.androidApp"
-        versionCode = 1
-        versionName = "1.0.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    android {
+        namespace = "io.github.sample"
+        compileSdk = 36
+        minSdk = 24
     }
+
 }
 
-//https://developer.android.com/develop/ui/compose/testing#setup
-dependencies {
-    androidTestImplementation(libs.androidx.uitest.junit4)
-    debugImplementation(libs.androidx.uitest.testManifest)
-    //temporary fix: https://youtrack.jetbrains.com/issue/CMP-5864
-    androidTestImplementation("androidx.test:monitor") {
-        version { strictly("1.6.1") }
-    }
-}
+
+
 
 compose.desktop {
     application {
