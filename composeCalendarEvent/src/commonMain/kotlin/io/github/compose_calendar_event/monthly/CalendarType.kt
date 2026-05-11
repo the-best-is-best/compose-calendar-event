@@ -10,28 +10,35 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextStyle
 
 
 @Composable
-internal fun CalendarType(isTwoWeeksView: Boolean, onSelectionChange: (Boolean) -> Unit) {
+internal fun CalendarType(
+    isTwoWeeksView: Boolean,
+    textStyle: TextStyle,
+    onSelectionChange: (Boolean) -> Unit,
+) {
     var expanded by remember { mutableStateOf(false) }
     Box {
         TextButton(onClick = { expanded = true }) {
-            Text(if (isTwoWeeksView) "2 Weeks" else "Month")
+            Text(if (isTwoWeeksView) "2 Weeks" else "Month", style = textStyle)
         }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
+            onDismissRequest = { expanded = false },
+
+            ) {
             DropdownMenuItem(
-                text = { Text("Month") },
+
+                text = { Text("Month", style = textStyle) },
                 onClick = {
                     onSelectionChange(false)
                     expanded = false
                 }
             )
             DropdownMenuItem(
-                text = { Text("2 Weeks") },
+                text = { Text("2 Weeks", style = textStyle) },
                 onClick = {
                     onSelectionChange(true)
                     expanded = false

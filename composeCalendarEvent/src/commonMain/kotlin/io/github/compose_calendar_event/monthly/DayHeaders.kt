@@ -2,10 +2,12 @@ package io.github.compose_calendar_event.monthly
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import kotlinx.datetime.DayOfWeek
 
 
@@ -13,10 +15,10 @@ import kotlinx.datetime.DayOfWeek
 internal fun DayHeaders(firstDayOfWeek: DayOfWeek) {
     val days =
         DayOfWeek.entries.drop(firstDayOfWeek.ordinal) + DayOfWeek.entries.take(firstDayOfWeek.ordinal)
-    Row(Modifier.fillMaxWidth()) {
+    Row(Modifier.fillMaxWidth().padding(end = 8.dp)) {
         days.forEach { day ->
             Text(
-                text = day.name.take(3),
+                text = day.name.take(1),
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )

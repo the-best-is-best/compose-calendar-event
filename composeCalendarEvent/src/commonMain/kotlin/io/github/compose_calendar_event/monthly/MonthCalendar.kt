@@ -26,11 +26,11 @@ internal fun MonthCalendar(
     selectedDate: LocalDate,
     selectedDayColor: Color,
     currentDayColor: Color,
-
+    highlightTodayDay: Boolean,
     currentDayTextColor: Color,
     eventDayColor: Color
 ) {
-    LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = modifier.padding(top = 8.dp)) {
+    LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = modifier.padding(top = 0.dp)) {
         items(days) { date ->
             val safeDate =
                 runCatching { LocalDate(selectedDate.year, selectedDate.month, date) }.getOrNull()
@@ -38,6 +38,7 @@ internal fun MonthCalendar(
                 event.start.date == safeDate
             }
             DayItem(
+                highlightTodayDay = highlightTodayDay,
                 date = date,
                 isSelected = safeDate == selectedDate,
                 isCurrentDay = safeDate == Clock.System.todayIn(TimeZone.currentSystemDefault()),
