@@ -16,15 +16,7 @@ android {
         }
     }
 
-    signingConfigs {
-        getByName("debug") {
-            storeFile =
-                file("/Users/michelleraouf/Desktop/kmm/kotlin-openid/simple/androidSimple/key")
-            storePassword = "key-pass"
-            keyPassword = "key-pass"
-            keyAlias = "key0"
-        }
-    }
+
 
     defaultConfig {
         minSdk = 24

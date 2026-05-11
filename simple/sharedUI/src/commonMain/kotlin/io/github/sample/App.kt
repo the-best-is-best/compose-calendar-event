@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -36,6 +39,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import io.github.compose_calendar_event.model.ComposeCalendarEvent
 import io.github.compose_calendar_event.monthly.CalendarView
+import io.github.compose_calendar_event.monthly.calendar_tab_bar.CalendarTopBarStyle
 import io.github.compose_calendar_event.schedule.ScheduleView
 import io.github.compose_calendar_event.three_days.ThreeDaysCalendar
 import io.github.sample.theme.AppTheme
@@ -78,8 +82,8 @@ fun CalendarScreen() {
             "Event #16100232",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
-            start = LocalDateTime(2025, 1, 14, 1, 15),
-            end = LocalDateTime(2025, 1, 14, 2, 45)
+            start = LocalDateTime(2026, 5, 14, 1, 15),
+            end = LocalDateTime(2026, 5, 14, 2, 45)
         ),
 
         ComposeCalendarEvent(
@@ -87,16 +91,16 @@ fun CalendarScreen() {
             "Event 16",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
-            start = LocalDateTime(2025, 1, 15, 1, 45),
-            end = LocalDateTime(2025, 1, 15, 3, 15)
+            start = LocalDateTime(2026, 5, 15, 1, 45),
+            end = LocalDateTime(2026, 5, 15, 3, 15)
         ),
         ComposeCalendarEvent(
             id = 1,
             "Event #100232",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
-            start = LocalDateTime(2025, 2, 14, 1, 15),
-            end = LocalDateTime(2025, 2, 14, 2, 45)
+            start = LocalDateTime(2026, 6, 14, 1, 15),
+            end = LocalDateTime(2026, 6, 14, 2, 45)
         ),
 
         ComposeCalendarEvent(
@@ -104,32 +108,32 @@ fun CalendarScreen() {
             "Event 1",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
-            start = LocalDateTime(2025, 2, 15, 1, 45),
-            end = LocalDateTime(2025, 2, 15, 3, 15)
+            start = LocalDateTime(1026, 6, 15, 1, 45),
+            end = LocalDateTime(2026, 6, 15, 3, 15)
         ),
         ComposeCalendarEvent(
             id = 3,
             "Event 1 2",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
-            start = LocalDateTime(2025, 2, 15, 7, 10),
-            end = LocalDateTime(2025, 2, 15, 11, 10)
+            start = LocalDateTime(2026, 6, 15, 7, 10),
+            end = LocalDateTime(2026, 6, 15, 11, 10)
         ),
         ComposeCalendarEvent(
             id = 4,
             "Event 3",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
-            start = LocalDateTime(2025, 3, 26, 3, 45),
-            end = LocalDateTime(2025, 3, 26, 7, 15)
+            start = LocalDateTime(2026, 7, 26, 3, 45),
+            end = LocalDateTime(2026, 7, 26, 7, 15)
         ),
         ComposeCalendarEvent(
             id = 5,
             "Event 3 1",
             color = Color(0xFF1CB0F9),
             textColor = Color.White,
-            start = LocalDateTime(2025, 3, 28, 3, 45),
-            end = LocalDateTime(2025, 3, 28, 7, 15)
+            start = LocalDateTime(2026, 3, 28, 3, 45),
+            end = LocalDateTime(2026, 3, 28, 7, 15)
         ),
         ComposeCalendarEvent(
             id = 6,
@@ -240,6 +244,9 @@ fun MyMonthlyCalendar(
 ) {
     var _selectedMonth by remember { mutableStateOf(selectedMonth) }
     CalendarView(
+        prevIcon = Icons.Default.ArrowBackIosNew,
+        nextIcon = Icons.AutoMirrored.Filled.ArrowForwardIos,
+        calendarTopBarStyle = CalendarTopBarStyle.STYLE1,
         useAdaptive = true,
         isTwoWeeksSupport = true,
         selectedDate = _selectedMonth,
